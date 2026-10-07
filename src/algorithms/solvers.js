@@ -1,115 +1,138 @@
 /**
- * GoldenHour Router - Algorithmic Solvers
+ * BudgetTrail - Orienteering Problem Solvers
  * 
- * Minimum Total Weighted Latency Problem (MWLP)
- * Objective: Minimize sum_{i=1..n} (weight_i * arrival_time_i)
+ * Problem: Selective TSP with Time Budget
+ * Given a depot (start/end), n places with rewards & stay times, travel speed, and a total time budget:
+ * Find a visiting sequence that MAXIMIZES total reward such that (travel time + stay time) <= budget.
  */
 
-export class RouteSolvers {
+export class OrienteeringSolvers {
   /**
-   * Euclidean distance between two 2D points
+   * Euclidean distance between two points
    */
   static distance(p1, p2) {
     const dx = p1.x - p2.x;
     const dy = p1.y - p2.y;
-    return Math.sqrt(dx * dx + dy * dy);
+    return Math.hypot(dx, dy);
   }
 
   /**
-   * Travel time between two points given vehicle speed (units/sec)
+   * Travel time between two points given vehicle speed
    */
   static travelTime(p1, p2, speed) {
-    const d = RouteSolvers.distance(p1, p2);
+    const d = OrienteeringSolvers.distance(p1, p2);
     return speed > 0 ? d / speed : 0;
   }
 
   /**
-   * Evaluate a full visiting order and compute arrival times and total weighted latency
+   * Build detailed timeline of an ordered route
    */
-  static evaluateRoute(depot, locations, order, speed) {
+  static evaluateRoute(depot, places, order, speed, returnToStart = true) {
     const n = order.length;
-    const arrivalTimes = new Array(n);
     let currentTime = 0;
-    let totalCost = 0;
+    let totalReward = 0;
+    let totalTravelTime = 0;
+    let totalStayTime = 0;
     let prev = depot;
+    const arrivalTimes = [];
 
     for (let i = 0; i < n; i++) {
       const idx = order[i];
-      const loc = locations[idx];
-      const t = RouteSolvers.travelTime(prev, loc, speed);
-      currentTime += t;
-      arrivalTimes[i] = {
-        locationIndex: idx,
-        location: loc,
-        arrivalTime: currentTime,
-        stepWeightedDelay: loc.weight * currentTime,
-        travelSegmentTime: t,
-        distanceFromPrev: RouteSolvers.distance(prev, loc)
-      };
-      totalCost += loc.weight * currentTime;
-      prev = loc;
+      const place = places[idx];
+      const travel = OrienteeringSolvers.travelTime(prev, place, speed);
+      const arrival = currentTime + travel;
+      const departure = arrival + place.stayTime;
+
+      arrivalTimes.push({
+        step: i + 1,
+        placeIndex: idx,
+        place,
+        travelFromPrev: travel,
+        arrivalTime: arrival,
+        stayTime: place.stayTime,
+        departureTime: departure,
+        rewardCollected: place.reward,
+        cumulativeReward: totalReward + place.reward
+      });
+
+      totalReward += place.reward;
+      totalTravelTime += travel;
+      totalStayTime += place.stayTime;
+      currentTime = departure;
+      prev = place;
+    }
+
+    let returnTravelTime = 0;
+    if (returnToStart && n > 0) {
+      returnTravelTime = OrienteeringSolvers.travelTime(prev, depot, speed);
+      currentTime += returnTravelTime;
+      totalTravelTime += returnTravelTime;
     }
 
     return {
       order,
-      totalCost,
+      totalReward,
+      timeUsed: currentTime,
+      totalTravelTime,
+      totalStayTime,
+      returnTravelTime,
       arrivalTimes,
-      totalDuration: currentTime
+      isFeasible: true
     };
   }
 
-  // ==========================================
-  // 1. DYNAMIC PROGRAMMING WITH BITMASK (O(n^2 * 2^n))
-  // ==========================================
-  static solveDP(depot, locations, speed, recordSteps = false) {
+  // =========================================================================
+  // 1. DYNAMIC PROGRAMMING WITH BITMASK (Exact Optimal Solver, O(n^2 * 2^n))
+  // =========================================================================
+  static solveDP(depot, places, speed, budget, returnToStart = true, recordSteps = false) {
     const startTime = performance.now();
-    const n = locations.length;
+    const n = places.length;
 
     if (n === 0) {
       return {
-        name: 'Dynamic Programming (Bitmask)',
+        name: 'Bitmask Dynamic Programming',
         code: 'DP',
         order: [],
-        totalCost: 0,
+        totalReward: 0,
+        timeUsed: 0,
         arrivalTimes: [],
-        totalDuration: 0,
         runtimeMs: 0,
         nodesExplored: 1,
         memoryEstimate: '0 KB',
-        stepHistory: []
+        stepHistory: [],
+        isOptimal: true
       };
     }
 
-    if (n > 20) {
-      throw new Error(`Dynamic Programming is capped at n <= 20 to prevent browser memory exhaustion (Requested: n=${n}).`);
+    if (n > 17) {
+      throw new Error(`Bitmask DP is capped at n <= 17 to prevent browser memory exhaustion (Requested: n=${n}).`);
     }
 
     const numStates = 1 << n;
-    const totalWeight = locations.reduce((sum, loc) => sum + loc.weight, 0);
 
-    // Precalculate weights of every mask
-    const weightOfMask = new Float64Array(numStates);
+    // Precalculate rewards of every subset mask
+    const rewardOfMask = new Float64Array(numStates);
     for (let mask = 0; mask < numStates; mask++) {
-      let w = 0;
+      let r = 0;
       for (let i = 0; i < n; i++) {
         if ((mask & (1 << i)) !== 0) {
-          w += locations[i].weight;
+          r += places[i].reward;
         }
       }
-      weightOfMask[mask] = w;
+      rewardOfMask[mask] = r;
     }
 
-    // Precalculate travel time matrix: 0..n-1 locations, n is depot
+    // Precalculate time matrix: 0..n-1 places, index n is depot
     const timeMatrix = Array.from({ length: n + 1 }, () => new Float64Array(n + 1));
     for (let i = 0; i < n; i++) {
-      timeMatrix[n][i] = RouteSolvers.travelTime(depot, locations[i], speed);
+      timeMatrix[n][i] = OrienteeringSolvers.travelTime(depot, places[i], speed);
       timeMatrix[i][n] = timeMatrix[n][i];
       for (let j = 0; j < n; j++) {
-        timeMatrix[i][j] = RouteSolvers.travelTime(locations[i], locations[j], speed);
+        timeMatrix[i][j] = OrienteeringSolvers.travelTime(places[i], places[j], speed);
       }
     }
 
-    // dp[mask * n + last]
+    // dp[mask * n + last] = minimum time to visit subset `mask` ending at node `last`
     const dp = new Float64Array(numStates * n);
     const parent = new Int16Array(numStates * n);
     dp.fill(Infinity);
@@ -118,12 +141,12 @@ export class RouteSolvers {
     let statesComputed = 0;
     const stepHistory = [];
 
-    // Base cases: single node visited from depot
+    // Base cases: single node visited directly from depot
     for (let i = 0; i < n; i++) {
       const mask = 1 << i;
-      const initialCost = timeMatrix[n][i] * totalWeight;
+      const initialTime = timeMatrix[n][i] + places[i].stayTime;
       const stateIdx = mask * n + i;
-      dp[stateIdx] = initialCost;
+      dp[stateIdx] = initialTime;
       parent[stateIdx] = -1;
       statesComputed++;
 
@@ -132,100 +155,89 @@ export class RouteSolvers {
           type: 'base_case',
           mask,
           maskBinary: mask.toString(2).padStart(n, '0'),
-          visitedIndices: [i],
           last: i,
           prev: 'Depot',
-          remWeight: totalWeight,
           travelTime: timeMatrix[n][i],
-          costAdded: initialCost,
-          totalCost: initialCost,
-          explanation: `Base Case: Depot ➔ #${i + 1} (${locations[i].name}). Transit: ${timeMatrix[n][i].toFixed(1)}s × Total Weight ${totalWeight} = ${initialCost.toFixed(1)} penalty.`
+          stayTime: places[i].stayTime,
+          accumulatedTime: initialTime,
+          reward: places[i].reward,
+          isFeasible: initialTime + (returnToStart ? timeMatrix[i][n] : 0) <= budget,
+          explanation: `Base Case: Depot ➔ ${places[i].name}. Travel: ${timeMatrix[n][i].toFixed(1)}m + Stay: ${places[i].stayTime}m = ${initialTime.toFixed(1)}m (Reward: +${places[i].reward})`
         });
       }
     }
 
-    // Populate DP states
+    // Populate DP states by subset mask
     for (let mask = 1; mask < numStates; mask++) {
-      const remWeight = totalWeight - weightOfMask[mask];
-      if (remWeight <= 0) continue;
-
       for (let u = 0; u < n; u++) {
         if ((mask & (1 << u)) === 0) continue;
-        const currentCost = dp[mask * n + u];
-        if (currentCost === Infinity) continue;
+        const curTime = dp[mask * n + u];
+        if (curTime === Infinity || curTime > budget) continue;
 
         for (let v = 0; v < n; v++) {
           if ((mask & (1 << v)) !== 0) continue;
 
           const nextMask = mask | (1 << v);
-          const t = timeMatrix[u][v];
-          const addedPenalty = t * remWeight;
-          const newCost = currentCost + addedPenalty;
+          const travel = timeMatrix[u][v];
+          const newTime = curTime + travel + places[v].stayTime;
           const nextStateIdx = nextMask * n + v;
 
           statesComputed++;
 
-          if (newCost < dp[nextStateIdx]) {
-            dp[nextStateIdx] = newCost;
+          if (newTime < dp[nextStateIdx]) {
+            dp[nextStateIdx] = newTime;
             parent[nextStateIdx] = u;
 
             if (recordSteps && n <= 5) {
-              const visitedArr = [];
-              for (let b = 0; b < n; b++) {
-                if ((nextMask & (1 << b)) !== 0) visitedArr.push(b);
-              }
+              const returnCost = returnToStart ? timeMatrix[v][n] : 0;
+              const totalEst = newTime + returnCost;
               stepHistory.push({
                 type: 'transition',
                 mask: nextMask,
                 maskBinary: nextMask.toString(2).padStart(n, '0'),
-                visitedIndices: visitedArr,
                 last: v,
                 prev: u,
-                remWeight,
-                travelTime: t,
-                costAdded: addedPenalty,
-                totalCost: newCost,
-                isBetter: true,
-                explanation: `From [${mask.toString(2).padStart(n, '0')}, Node #${u + 1}] ➔ visit Node #${v + 1}: +(${t.toFixed(1)}s × ${remWeight} rem wt) = +${addedPenalty.toFixed(1)} penalty. Total: ${newCost.toFixed(1)} (New Minimum)`
+                travelTime: travel,
+                stayTime: places[v].stayTime,
+                accumulatedTime: newTime,
+                reward: rewardOfMask[nextMask],
+                isFeasible: totalEst <= budget,
+                explanation: `From [${mask.toString(2).padStart(n, '0')}, #${u + 1}] ➔ #${v + 1} (${places[v].name}): +${travel.toFixed(1)}m travel + ${places[v].stayTime}m stay = ${newTime.toFixed(1)}m (New Min Time for this subset)`
               });
             }
-          } else if (recordSteps && n <= 5) {
-            stepHistory.push({
-              type: 'transition_pruned',
-              mask: nextMask,
-              maskBinary: nextMask.toString(2).padStart(n, '0'),
-              last: v,
-              prev: u,
-              remWeight,
-              travelTime: t,
-              costAdded: addedPenalty,
-              totalCost: newCost,
-              existingCost: dp[nextStateIdx],
-              isBetter: false,
-              explanation: `From [${mask.toString(2).padStart(n, '0')}, Node #${u + 1}] ➔ Node #${v + 1} cost ${newCost.toFixed(1)} is suboptimal (existing: ${dp[nextStateIdx].toFixed(1)})`
-            });
           }
         }
       }
     }
 
-    // Find optimal ending node at full mask
-    const fullMask = numStates - 1;
-    let minCost = Infinity;
+    // Find the subset mask that MAXIMIZES reward within budget
+    let bestReward = 0;
+    let minTimeForBestReward = Infinity;
+    let bestMask = 0;
     let bestLast = -1;
 
-    for (let i = 0; i < n; i++) {
-      const cost = dp[fullMask * n + i];
-      if (cost < minCost) {
-        minCost = cost;
-        bestLast = i;
+    for (let mask = 1; mask < numStates; mask++) {
+      const maskReward = rewardOfMask[mask];
+
+      for (let u = 0; u < n; u++) {
+        if ((mask & (1 << u)) === 0) continue;
+        const endTime = dp[mask * n + u] + (returnToStart ? timeMatrix[u][n] : 0);
+
+        if (endTime <= budget) {
+          if (maskReward > bestReward || (maskReward === bestReward && endTime < minTimeForBestReward)) {
+            bestReward = maskReward;
+            minTimeForBestReward = endTime;
+            bestMask = mask;
+            bestLast = u;
+          }
+        }
       }
     }
 
-    // Reconstruct optimal path
+    // Reconstruct optimal route sequence from parent table
     const order = [];
     if (bestLast !== -1) {
-      let currMask = fullMask;
+      let currMask = bestMask;
       let currNode = bestLast;
 
       while (currNode !== -1) {
@@ -239,7 +251,7 @@ export class RouteSolvers {
 
     const endTime = performance.now();
     const runtimeMs = Math.max(0.01, endTime - startTime);
-    const evalResult = RouteSolvers.evaluateRoute(depot, locations, order, speed);
+    const evalResult = OrienteeringSolvers.evaluateRoute(depot, places, order, speed, returnToStart);
 
     const bytesUsed = (numStates * n * 8) + (numStates * n * 2) + (numStates * 8);
     const memoryEstimate = bytesUsed > 1048576 
@@ -247,237 +259,270 @@ export class RouteSolvers {
       : `${(bytesUsed / 1024).toFixed(1)} KB`;
 
     return {
-      name: 'Dynamic Programming (Bitmask)',
+      name: 'Bitmask Dynamic Programming',
       code: 'DP',
       order,
-      totalCost: evalResult.totalCost,
+      totalReward: evalResult.totalReward,
+      timeUsed: evalResult.timeUsed,
       arrivalTimes: evalResult.arrivalTimes,
-      totalDuration: evalResult.totalDuration,
+      totalTravelTime: evalResult.totalTravelTime,
+      totalStayTime: evalResult.totalStayTime,
+      returnTravelTime: evalResult.returnTravelTime,
       runtimeMs,
       nodesExplored: statesComputed,
       memoryEstimate,
       stepHistory,
-      numStates
+      numStates,
+      isOptimal: true
     };
   }
 
-  // ==========================================
-  // 2. BACKTRACKING WITH BRANCH & BOUND
-  // ==========================================
-  static solveBacktracking(depot, locations, speed, enablePruning = true) {
+  // =========================================================================
+  // 2. BACKTRACKING WITH BRANCH & BOUND PRUNING (O(n!))
+  // =========================================================================
+  static solveBacktracking(depot, places, speed, budget, returnToStart = true, enablePruning = true) {
     const startTime = performance.now();
-    const n = locations.length;
+    const n = places.length;
 
     if (n === 0) {
       return {
-        name: enablePruning ? 'Backtracking (B&B)' : 'Exhaustive Backtracking',
-        code: enablePruning ? 'B&B' : 'BT_NAIVE',
+        name: enablePruning ? 'Branch & Bound Search' : 'Exhaustive Backtracking',
+        code: enablePruning ? 'BB' : 'BT_NAIVE',
         order: [],
-        totalCost: 0,
+        totalReward: 0,
+        timeUsed: 0,
         arrivalTimes: [],
-        totalDuration: 0,
         runtimeMs: 0,
         nodesExplored: 1,
-        memoryEstimate: '< 1 KB'
+        memoryEstimate: '< 1 KB',
+        isOptimal: true
       };
     }
 
-    const totalWeight = locations.reduce((sum, loc) => sum + loc.weight, 0);
-
     const timeMatrix = Array.from({ length: n + 1 }, () => new Float64Array(n + 1));
     for (let i = 0; i < n; i++) {
-      timeMatrix[n][i] = RouteSolvers.travelTime(depot, locations[i], speed);
+      timeMatrix[n][i] = OrienteeringSolvers.travelTime(depot, places[i], speed);
       timeMatrix[i][n] = timeMatrix[n][i];
       for (let j = 0; j < n; j++) {
-        timeMatrix[i][j] = RouteSolvers.travelTime(locations[i], locations[j], speed);
+        timeMatrix[i][j] = OrienteeringSolvers.travelTime(places[i], places[j], speed);
       }
     }
 
-    // Min exit time lower bound
-    const minExitTime = new Float64Array(n + 1);
-    for (let i = 0; i <= n; i++) {
-      let m = Infinity;
-      for (let j = 0; j < n; j++) {
-        if (i !== j) {
-          m = Math.min(m, timeMatrix[i][j]);
-        }
-      }
-      minExitTime[i] = m === Infinity ? 0 : m;
-    }
+    const totalRewardSum = places.reduce((sum, p) => sum + p.reward, 0);
 
-    let bestCost = Infinity;
+    let bestReward = 0;
+    let bestTime = Infinity;
     let bestOrder = [];
     let nodesExplored = 0;
 
-    const currentOrder = new Int32Array(n);
+    const currentOrder = [];
     const visited = new Uint8Array(n);
 
-    // Seed bestCost using Greedy for rapid pruning
+    // If pruning is enabled, seed bestReward with Greedy for faster early pruning
     if (enablePruning) {
-      const greedyRes = RouteSolvers.solveGreedy(depot, locations, speed);
-      bestCost = greedyRes.totalCost;
+      const greedyRes = OrienteeringSolvers.solveGreedy(depot, places, speed, budget, returnToStart);
+      bestReward = greedyRes.totalReward;
+      bestTime = greedyRes.timeUsed;
       bestOrder = [...greedyRes.order];
     }
 
-    function search(depth, lastNodeIndex, currentCost, remWeight) {
+    function search(lastNodeIndex, currentTime, currentReward, remainingPotentialReward) {
       nodesExplored++;
 
-      if (depth === n) {
-        if (currentCost < bestCost) {
-          bestCost = currentCost;
-          bestOrder = Array.from(currentOrder);
-        }
-        return;
-      }
+      // Check current route as a valid candidate
+      const returnTime = returnToStart ? (lastNodeIndex === n ? 0 : timeMatrix[lastNodeIndex][n]) : 0;
+      const totalTimeWithReturn = currentTime + returnTime;
 
-      // Branch and Bound Lower Bounding Pruning
-      if (enablePruning) {
-        const lowerBound = currentCost + minExitTime[lastNodeIndex] * remWeight;
-        if (lowerBound >= bestCost) {
-          return;
+      if (totalTimeWithReturn <= budget) {
+        if (currentReward > bestReward || (currentReward === bestReward && totalTimeWithReturn < bestTime)) {
+          bestReward = currentReward;
+          bestTime = totalTimeWithReturn;
+          bestOrder = [...currentOrder];
         }
       }
 
-      if (!enablePruning && nodesExplored > 10000000) {
+      // Hard safety limit on unpruned search to prevent freeze
+      if (!enablePruning && nodesExplored > 5000000) {
         return;
       }
 
       for (let i = 0; i < n; i++) {
         if (!visited[i]) {
+          const travel = timeMatrix[lastNodeIndex][i];
+          const nextTime = currentTime + travel + places[i].stayTime;
+          const returnFromNext = returnToStart ? timeMatrix[i][n] : 0;
+
+          // Pruning Rule 1: Time budget violation
+          if (enablePruning && nextTime + returnFromNext > budget) {
+            continue;
+          }
+
+          // Pruning Rule 2: Upper bound optimality check
+          if (enablePruning && currentReward + remainingPotentialReward <= bestReward) {
+            return; // Prune entire branch
+          }
+
           visited[i] = 1;
-          currentOrder[depth] = i;
+          currentOrder.push(i);
 
-          const t = timeMatrix[lastNodeIndex][i];
-          const addedPenalty = t * remWeight;
-          const nextCost = currentCost + addedPenalty;
-          const nextRemWeight = remWeight - locations[i].weight;
+          search(
+            i,
+            nextTime,
+            currentReward + places[i].reward,
+            remainingPotentialReward - places[i].reward
+          );
 
-          search(depth + 1, i, nextCost, nextRemWeight);
-
+          currentOrder.pop();
           visited[i] = 0;
         }
       }
     }
 
-    search(0, n, 0, totalWeight);
+    search(n, 0, 0, totalRewardSum);
 
     const endTime = performance.now();
     const runtimeMs = Math.max(0.01, endTime - startTime);
-    const evalResult = RouteSolvers.evaluateRoute(depot, locations, bestOrder, speed);
+    const evalResult = OrienteeringSolvers.evaluateRoute(depot, places, bestOrder, speed, returnToStart);
 
     return {
-      name: enablePruning ? 'Backtracking (Branch & Bound)' : 'Exhaustive Backtracking (No Pruning)',
-      code: enablePruning ? 'B&B' : 'BT_NAIVE',
+      name: enablePruning ? 'Branch & Bound (Pruning Active)' : 'Exhaustive Backtracking (No Pruning)',
+      code: enablePruning ? 'BB' : 'BT_NAIVE',
       order: bestOrder,
-      totalCost: evalResult.totalCost,
+      totalReward: evalResult.totalReward,
+      timeUsed: evalResult.timeUsed,
       arrivalTimes: evalResult.arrivalTimes,
-      totalDuration: evalResult.totalDuration,
+      totalTravelTime: evalResult.totalTravelTime,
+      totalStayTime: evalResult.totalStayTime,
+      returnTravelTime: evalResult.returnTravelTime,
       runtimeMs,
       nodesExplored,
-      memoryEstimate: `${((n * 4 * 2) / 1024).toFixed(2)} KB (Call Stack)`
+      memoryEstimate: `${((n * 4 * 2) / 1024).toFixed(2)} KB (Call Stack)`,
+      isOptimal: true
     };
   }
 
-  // ==========================================
+  // =========================================================================
   // 3. GREEDY HEURISTIC SOLVER (O(n^2))
-  // ==========================================
-  static solveGreedy(depot, locations, speed) {
+  // =========================================================================
+  static solveGreedy(depot, places, speed, budget, returnToStart = true) {
     const startTime = performance.now();
-    const n = locations.length;
+    const n = places.length;
 
     if (n === 0) {
       return {
-        name: 'Greedy Heuristic (Max Weight/Time)',
+        name: 'Greedy Heuristic (Max Reward/Time)',
         code: 'GREEDY',
         order: [],
-        totalCost: 0,
+        totalReward: 0,
+        timeUsed: 0,
         arrivalTimes: [],
-        totalDuration: 0,
         runtimeMs: 0,
         nodesExplored: 1,
-        memoryEstimate: '< 1 KB'
+        memoryEstimate: '< 1 KB',
+        isOptimal: false
       };
     }
 
-    const unvisited = new Set(locations.map((_, i) => i));
+    const unvisited = new Set(places.map((_, i) => i));
     const order = [];
     let currentPos = depot;
+    let currentTime = 0;
     let comparisons = 0;
 
     while (unvisited.size > 0) {
       let bestIdx = -1;
-      let bestRatio = -Infinity;
+      let bestScore = -Infinity;
 
       for (const idx of unvisited) {
         comparisons++;
-        const loc = locations[idx];
-        const time = RouteSolvers.travelTime(currentPos, loc, speed);
-        const ratio = time > 0.0001 ? loc.weight / time : loc.weight * 1e6;
+        const place = places[idx];
+        const travel = OrienteeringSolvers.travelTime(currentPos, place, speed);
+        const cost = travel + place.stayTime;
+        const returnTravel = returnToStart ? OrienteeringSolvers.travelTime(place, depot, speed) : 0;
 
-        if (ratio > bestRatio) {
-          bestRatio = ratio;
-          bestIdx = idx;
+        // Check if feasible within total budget
+        if (currentTime + cost + returnTravel <= budget) {
+          const score = place.reward / Math.max(cost, 0.001);
+          if (score > bestScore) {
+            bestScore = score;
+            bestIdx = idx;
+          }
         }
+      }
+
+      if (bestIdx === -1) {
+        break; // No more places fit within budget
       }
 
       order.push(bestIdx);
       unvisited.delete(bestIdx);
-      currentPos = locations[bestIdx];
+      const chosen = places[bestIdx];
+      const travel = OrienteeringSolvers.travelTime(currentPos, chosen, speed);
+      currentTime += travel + chosen.stayTime;
+      currentPos = chosen;
     }
 
     const endTime = performance.now();
     const runtimeMs = Math.max(0.01, endTime - startTime);
-    const evalResult = RouteSolvers.evaluateRoute(depot, locations, order, speed);
+    const evalResult = OrienteeringSolvers.evaluateRoute(depot, places, order, speed, returnToStart);
 
     return {
-      name: 'Greedy Heuristic (Max Weight/Time)',
+      name: 'Greedy Heuristic (Reward/Cost Ratio)',
       code: 'GREEDY',
       order,
-      totalCost: evalResult.totalCost,
+      totalReward: evalResult.totalReward,
+      timeUsed: evalResult.timeUsed,
       arrivalTimes: evalResult.arrivalTimes,
-      totalDuration: evalResult.totalDuration,
+      totalTravelTime: evalResult.totalTravelTime,
+      totalStayTime: evalResult.totalStayTime,
+      returnTravelTime: evalResult.returnTravelTime,
       runtimeMs,
       nodesExplored: comparisons,
-      memoryEstimate: '< 2 KB'
+      memoryEstimate: '< 2 KB',
+      isOptimal: false
     };
   }
 
-  static solveAll(depot, locations, speed, enablePruning = true) {
-    const n = locations.length;
-    const greedy = RouteSolvers.solveGreedy(depot, locations, speed);
+  // =========================================================================
+  // 4. SOLVE ALL & CROSS-COMPARE
+  // =========================================================================
+  static solveAll(depot, places, speed, budget, returnToStart = true, enablePruning = true) {
+    const n = places.length;
+    const greedy = OrienteeringSolvers.solveGreedy(depot, places, speed, budget, returnToStart);
 
     let dp = null;
     let dpError = null;
-    if (n <= 18) {
+    if (n <= 17) {
       try {
-        dp = RouteSolvers.solveDP(depot, locations, speed);
+        dp = OrienteeringSolvers.solveDP(depot, places, speed, budget, returnToStart);
       } catch (err) {
         dpError = err.message;
       }
     } else {
-      dpError = `DP capped (n = ${n} > 18 limit)`;
+      dpError = `DP bypassed (n = ${n} > 17 limit)`;
     }
 
     let bb = null;
     let bbError = null;
-    if (n <= 13) {
+    if (n <= 14 || (enablePruning && n <= 16)) {
       try {
-        bb = RouteSolvers.solveBacktracking(depot, locations, speed, enablePruning);
+        bb = OrienteeringSolvers.solveBacktracking(depot, places, speed, budget, returnToStart, enablePruning);
       } catch (err) {
         bbError = err.message;
       }
     } else {
-      bbError = `Backtracking bypassed (n = ${n} > 13 limit)`;
+      bbError = `Branch & Bound bypassed (n = ${n} > 14 limit)`;
     }
 
-    const baselineCost = dp ? dp.totalCost : (bb ? bb.totalCost : greedy.totalCost);
+    const optimalReward = dp ? dp.totalReward : (bb ? bb.totalReward : greedy.totalReward);
 
     const enrich = (sol) => {
       if (!sol) return null;
-      const gap = baselineCost > 0 ? ((sol.totalCost - baselineCost) / baselineCost) * 100 : 0;
+      const gap = optimalReward > 0 ? ((optimalReward - sol.totalReward) / optimalReward) * 100 : 0;
       return {
         ...sol,
-        optimalityGapPct: Math.max(0, gap)
+        rewardGapPct: Math.max(0, gap),
+        budgetUtilizationPct: budget > 0 ? Math.min(100, (sol.timeUsed / budget) * 100) : 0
       };
     };
 
@@ -487,7 +532,66 @@ export class RouteSolvers {
       backtracking: enrich(bb),
       bbError,
       greedy: enrich(greedy),
-      baselineCost
+      optimalReward
+    };
+  }
+
+  // =========================================================================
+  // 5. IN-APP SELF-CHECK VERIFICATION SUITE (50 Random Instances)
+  // =========================================================================
+  static runSelfCheck(numTests = 50) {
+    const results = [];
+    let passedCount = 0;
+    let failedCount = 0;
+
+    for (let t = 1; t <= numTests; t++) {
+      const n = Math.floor(Math.random() * 5) + 3; // 3 to 7 places
+      const speed = Math.floor(Math.random() * 50) + 50; // 50-100 px/min
+      const budget = Math.floor(Math.random() * 200) + 100; // 100-300 min
+      const returnToStart = Math.random() > 0.3;
+
+      const depot = { x: 300, y: 250, name: 'Start Depot' };
+      const places = [];
+      for (let i = 0; i < n; i++) {
+        places.push({
+          id: i + 1,
+          name: `Spot #${i + 1}`,
+          x: Math.floor(50 + Math.random() * 500),
+          y: Math.floor(50 + Math.random() * 400),
+          reward: Math.floor(Math.random() * 10) + 1,
+          stayTime: Math.floor(Math.random() * 20) + 5
+        });
+      }
+
+      const dpRes = OrienteeringSolvers.solveDP(depot, places, speed, budget, returnToStart);
+      const bbRes = OrienteeringSolvers.solveBacktracking(depot, places, speed, budget, returnToStart, true);
+      const greedyRes = OrienteeringSolvers.solveGreedy(depot, places, speed, budget, returnToStart);
+
+      const isMatch = dpRes.totalReward === bbRes.totalReward && dpRes.timeUsed <= budget + 1e-4;
+
+      if (isMatch) passedCount++;
+      else failedCount++;
+
+      results.push({
+        testId: t,
+        n,
+        budget,
+        returnToStart,
+        dpReward: dpRes.totalReward,
+        bbReward: bbRes.totalReward,
+        greedyReward: greedyRes.totalReward,
+        dpTime: dpRes.timeUsed,
+        bbTime: bbRes.timeUsed,
+        passed: isMatch
+      });
+    }
+
+    return {
+      total: numTests,
+      passed: passedCount,
+      failed: failedCount,
+      allPassed: failedCount === 0,
+      details: results
     };
   }
 }

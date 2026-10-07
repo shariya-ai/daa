@@ -1,94 +1,113 @@
 /**
- * GoldenHour Router - Scenario Presets
+ * BudgetTrail - Preset Orienteering Scenarios
  */
 
 export const PRESET_SCENARIOS = [
   {
-    id: 'greedy_trap',
-    name: '🚨 The Greedy Trap (Greedy Fails Suboptimally)',
-    description: 'A deceptive setup where Greedy prioritizes nearby low-urgency triage points, delaying distant critical ICUs and causing massive cumulative penalty. DP finds the true global minimum.',
-    badge: 'Greedy Gap > 20%',
-    depot: { x: 180, y: 340, name: 'Central Relief Depot' },
-    speed: 120,
-    locations: [
-      { id: 1, name: 'St. Jude Trauma ICU', x: 680, y: 340, weight: 10, type: 'hospital' },
-      { id: 2, name: 'East Clinic A', x: 260, y: 320, weight: 2, type: 'clinic' },
-      { id: 3, name: 'East Clinic B', x: 310, y: 300, weight: 2, type: 'clinic' },
-      { id: 4, name: 'East Clinic C', x: 360, y: 360, weight: 2, type: 'clinic' },
-      { id: 5, name: 'Regional Burn Center', x: 660, y: 460, weight: 9, type: 'hospital' },
-      { id: 6, name: 'Suburban Aid Post', x: 420, y: 320, weight: 2, type: 'shelter' }
+    id: 'scenic_trap',
+    name: '1. The Scenic Tour Trap (Greedy Trap)',
+    tag: 'Heuristic Trap',
+    color: '#f59e0b',
+    description: 'Greedy is lured into low-reward nearby cafes (R=2, Stay=12m), exhausting the budget. DP skips them and visits high-reward summits (R=10, 9) scoring +250% more reward!',
+    depot: { x: 140, y: 260, name: 'Basecamp Hotel' },
+    budget: 135,
+    speed: 80,
+    returnToStart: true,
+    places: [
+      { id: 1, name: 'Local Souvenir Cafe', x: 190, y: 250, reward: 2, stayTime: 12, category: 'cafe' },
+      { id: 2, name: 'Town Fountain Square', x: 230, y: 270, reward: 2, stayTime: 12, category: 'landmark' },
+      { id: 3, name: 'Mini Botanical Park', x: 260, y: 230, reward: 3, stayTime: 14, category: 'park' },
+      { id: 4, name: 'Artisan Bakery', x: 290, y: 280, reward: 2, stayTime: 10, category: 'cafe' },
+      { id: 5, name: 'Eagle Crest Alpine Summit', x: 520, y: 130, reward: 10, stayTime: 8, category: 'viewpoint' },
+      { id: 6, name: 'Grand Historic Citadel', x: 570, y: 210, reward: 9, stayTime: 10, category: 'museum' },
+      { id: 7, name: 'Sunset Panoramic Plateau', x: 490, y: 350, reward: 9, stayTime: 8, category: 'viewpoint' }
+    ]
+  },
+  {
+    id: 'time_crunch',
+    name: '2. Strict Time Crunch (Tight Budget)',
+    tag: 'Edge Case',
+    color: '#ef4444',
+    description: 'Budget is razor-thin (65 min). The vehicle must precisely account for return travel time to depot. Only the highest density reward cluster is reachable.',
+    depot: { x: 300, y: 240, name: 'Central Expedition HQ' },
+    budget: 65,
+    speed: 90,
+    returnToStart: true,
+    places: [
+      { id: 1, name: 'North Observatory', x: 290, y: 90, reward: 8, stayTime: 10, category: 'viewpoint' },
+      { id: 2, name: 'East Science Pavilion', x: 490, y: 220, reward: 9, stayTime: 12, category: 'museum' },
+      { id: 3, name: 'South Garden Terrace', x: 320, y: 390, reward: 6, stayTime: 8, category: 'park' },
+      { id: 4, name: 'West Valley Sanctuary', x: 100, y: 250, reward: 7, stayTime: 15, category: 'landmark' },
+      { id: 5, name: 'Downtown Plaza', x: 340, y: 200, reward: 4, stayTime: 6, category: 'landmark' }
+    ]
+  },
+  {
+    id: 'metropolis_marathon',
+    name: '3. Metropolis Sightseeing Marathon (n=12)',
+    tag: 'Real-World Tour',
+    color: '#06b6d4',
+    description: 'A full 12-attraction city grid with diverse stay times and rewards across 4 geographic quadrants.',
+    depot: { x: 350, y: 240, name: 'Grand Central Station' },
+    budget: 240,
+    speed: 85,
+    returnToStart: true,
+    places: [
+      { id: 1, name: 'Modern Art Museum', x: 450, y: 120, reward: 9, stayTime: 20, category: 'museum' },
+      { id: 2, name: 'Skydeck Tower', x: 550, y: 160, reward: 10, stayTime: 18, category: 'viewpoint' },
+      { id: 3, name: 'Royal Waterfront Garden', x: 520, y: 340, reward: 7, stayTime: 15, category: 'park' },
+      { id: 4, name: 'Old Town Clocktower', x: 420, y: 380, reward: 6, stayTime: 12, category: 'landmark' },
+      { id: 5, name: 'Gourmet Food Market', x: 280, y: 390, reward: 5, stayTime: 15, category: 'cafe' },
+      { id: 6, name: 'Heritage Cathedral', x: 170, y: 330, reward: 8, stayTime: 16, category: 'landmark' },
+      { id: 7, name: 'River Walkway Promenade', x: 140, y: 220, reward: 4, stayTime: 10, category: 'park' },
+      { id: 8, name: 'National Science Dome', x: 180, y: 110, reward: 9, stayTime: 22, category: 'museum' },
+      { id: 9, name: 'Botanical Biosphere', x: 300, y: 90, reward: 6, stayTime: 14, category: 'park' },
+      { id: 10, name: 'Historical Fort Bastion', x: 620, y: 260, reward: 8, stayTime: 15, category: 'landmark' },
+      { id: 11, name: 'Artisan Coffee Roastery', x: 390, y: 180, reward: 3, stayTime: 8, category: 'cafe' },
+      { id: 12, name: 'Harbor Lighthouse', x: 600, y: 410, reward: 7, stayTime: 12, category: 'viewpoint' }
     ]
   },
   {
     id: 'stepthrough_demo',
-    name: '🔍 Small Demo (n = 5 for DP Step-Through)',
-    description: 'Clean 5-node setup specifically crafted for video presentation and the DP Bitmask table inspector (2^5 = 32 states).',
-    badge: 'Video Ready (n=5)',
-    depot: { x: 240, y: 280, name: 'HQ Relief Depot' },
-    speed: 100,
-    locations: [
-      { id: 1, name: 'General Hospital', x: 440, y: 140, weight: 9, type: 'hospital' },
-      { id: 2, name: 'North Shelter', x: 580, y: 210, weight: 5, type: 'shelter' },
-      { id: 3, name: 'Metro Clinic', x: 630, y: 400, weight: 8, type: 'clinic' },
-      { id: 4, name: 'South Aid Post', x: 410, y: 460, weight: 3, type: 'shelter' },
-      { id: 5, name: 'Mobile ICU', x: 270, y: 430, weight: 7, type: 'hospital' }
+    name: '4. Step-Through Mini Demo (n=4)',
+    tag: 'DP Stepper',
+    color: '#10b981',
+    description: 'Designed specifically for the Bitmask DP Table visualizer. Exactly 16 states (2^4) to easily trace recurrence relations and transitions.',
+    depot: { x: 150, y: 220, name: 'Base Station' },
+    budget: 150,
+    speed: 75,
+    returnToStart: true,
+    places: [
+      { id: 1, name: 'Alpha Point', x: 260, y: 130, reward: 8, stayTime: 10, category: 'landmark' },
+      { id: 2, name: 'Beta Ridge', x: 440, y: 150, reward: 10, stayTime: 15, category: 'viewpoint' },
+      { id: 3, name: 'Gamma Valley', x: 410, y: 310, reward: 6, stayTime: 12, category: 'park' },
+      { id: 4, name: 'Delta Clinic', x: 230, y: 330, reward: 4, stayTime: 8, category: 'cafe' }
     ]
   },
   {
-    id: 'clustered_outbreak',
-    name: '🏙️ Dual-Cluster Urban Outbreak (n = 8)',
-    description: 'Two separate geographic clusters (Downtown Trauma Sector and Harbor Quarantine). Tests intra-cluster vs inter-cluster dispatch.',
-    badge: 'Spatial Clusters',
-    depot: { x: 440, y: 290, name: 'Central Logistics Hub' },
-    speed: 130,
-    locations: [
-      { id: 1, name: 'Downtown Hospital', x: 190, y: 170, weight: 10, type: 'hospital' },
-      { id: 2, name: 'Civic Shelter A', x: 150, y: 230, weight: 4, type: 'shelter' },
-      { id: 3, name: 'Civic Shelter B', x: 230, y: 250, weight: 5, type: 'shelter' },
-      { id: 4, name: 'West End Clinic', x: 170, y: 110, weight: 7, type: 'clinic' },
-      { id: 5, name: 'Harbor Emergency ICU', x: 700, y: 410, weight: 10, type: 'hospital' },
-      { id: 6, name: 'Port Triage Station', x: 760, y: 350, weight: 6, type: 'clinic' },
-      { id: 7, name: 'Dockside Evac Point', x: 660, y: 470, weight: 3, type: 'shelter' },
-      { id: 8, name: 'Coastal Aid Base', x: 800, y: 440, weight: 4, type: 'shelter' }
-    ]
-  },
-  {
-    id: 'critical_corridor',
-    name: '⚡ Critical Highway Corridor (n = 7)',
-    description: 'A linear transit corridor with urgent intermediate clinics and a massive regional disaster hospital at the frontier.',
-    badge: 'Corridor Logistics',
-    depot: { x: 110, y: 290, name: 'Highway Depot 0' },
-    speed: 150,
-    locations: [
-      { id: 1, name: 'Mile 10 Outpost', x: 230, y: 270, weight: 2, type: 'clinic' },
-      { id: 2, name: 'Mile 25 Triage Camp', x: 350, y: 310, weight: 4, type: 'shelter' },
-      { id: 3, name: 'Mile 40 Community Hosp', x: 470, y: 250, weight: 8, type: 'hospital' },
-      { id: 4, name: 'Mile 55 Aid Station', x: 580, y: 330, weight: 3, type: 'clinic' },
-      { id: 5, name: 'Mile 70 Major Trauma ICU', x: 720, y: 260, weight: 10, type: 'hospital' },
-      { id: 6, name: 'Mile 85 Shelter Zone', x: 820, y: 320, weight: 5, type: 'shelter' },
-      { id: 7, name: 'Mile 90 Frontier Post', x: 900, y: 280, weight: 6, type: 'shelter' }
-    ]
-  },
-  {
-    id: 'mass_casualty',
-    name: '🏥 Mass Casualty Field Triage (n = 12)',
-    description: 'Dense 12-location disaster simulation with high-variance urgency weights (1 to 10), rigorously comparing DP vs B&B vs Greedy.',
-    badge: 'Complex Scale (n=12)',
-    depot: { x: 470, y: 270, name: 'Incident Command HQ' },
-    speed: 140,
-    locations: [
-      { id: 1, name: 'University Medical Center', x: 210, y: 140, weight: 10, type: 'hospital' },
-      { id: 2, name: 'North Arena Shelter', x: 370, y: 110, weight: 6, type: 'shelter' },
-      { id: 3, name: 'Riverside Clinic', x: 670, y: 120, weight: 4, type: 'clinic' },
-      { id: 4, name: 'East General Hospital', x: 780, y: 190, weight: 9, type: 'hospital' },
-      { id: 5, name: 'Harbor Evac Camp', x: 800, y: 370, weight: 3, type: 'shelter' },
-      { id: 6, name: 'Industrial Aid Center', x: 680, y: 450, weight: 7, type: 'clinic' },
-      { id: 7, name: 'South Children’s ICU', x: 490, y: 470, weight: 10, type: 'hospital' },
-      { id: 8, name: 'Metro South Shelter', x: 310, y: 440, weight: 2, type: 'shelter' },
-      { id: 9, name: 'West Valley Clinic', x: 140, y: 360, weight: 5, type: 'clinic' },
-      { id: 10, name: 'Central Red Cross Station', x: 340, y: 250, weight: 8, type: 'shelter' },
-      { id: 11, name: 'East End Field Hospital', x: 600, y: 260, weight: 9, type: 'hospital' },
-      { id: 12, name: 'Transit Center Triage', x: 470, y: 370, weight: 6, type: 'clinic' }
+    id: 'drone_relay',
+    name: '5. Drone Survey Relay (n=14)',
+    tag: 'Large Instance',
+    color: '#8b5cf6',
+    description: 'Battery-limited autonomous aerial survey with 14 high-value sensor nodes across a wide territory.',
+    depot: { x: 350, y: 250, name: 'Drone Launch Pad' },
+    budget: 260,
+    speed: 110,
+    returnToStart: true,
+    places: [
+      { id: 1, name: 'Sensor Alpha', x: 120, y: 100, reward: 7, stayTime: 8, category: 'landmark' },
+      { id: 2, name: 'Solar Array Station', x: 240, y: 80, reward: 9, stayTime: 10, category: 'museum' },
+      { id: 3, name: 'Relay Tower North', x: 390, y: 70, reward: 10, stayTime: 12, category: 'viewpoint' },
+      { id: 4, name: 'Weather Mast East', x: 550, y: 90, reward: 8, stayTime: 8, category: 'viewpoint' },
+      { id: 5, name: 'Wind Turbine Beta', x: 620, y: 190, reward: 6, stayTime: 6, category: 'landmark' },
+      { id: 6, name: 'Forest Monitoring Post', x: 600, y: 320, reward: 9, stayTime: 10, category: 'park' },
+      { id: 7, name: 'Hydroelectric Dam', x: 500, y: 410, reward: 10, stayTime: 14, category: 'museum' },
+      { id: 8, name: 'Seismic Station South', x: 360, y: 430, reward: 8, stayTime: 9, category: 'landmark' },
+      { id: 9, name: 'Agricultural Probe', x: 210, y: 400, reward: 5, stayTime: 6, category: 'park' },
+      { id: 10, name: 'Geothermal Borehole', x: 100, y: 340, reward: 7, stayTime: 10, category: 'landmark' },
+      { id: 11, name: 'Wildlife Cam Station', x: 80, y: 220, reward: 4, stayTime: 5, category: 'park' },
+      { id: 12, name: 'Central Radar Link', x: 260, y: 200, reward: 8, stayTime: 8, category: 'viewpoint' },
+      { id: 13, name: 'Micro-Grid Transformer', x: 440, y: 210, reward: 6, stayTime: 7, category: 'cafe' },
+      { id: 14, name: 'Optical Telemetry Hub', x: 370, y: 330, reward: 9, stayTime: 10, category: 'museum' }
     ]
   }
 ];

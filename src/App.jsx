@@ -1,36 +1,51 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Navbar } from './components/Navbar';
-import { RouterCanvas } from './components/RouterCanvas';
-import { TelemetryPanel } from './components/TelemetryPanel';
-import { SidebarEditor } from './components/SidebarEditor';
-import { ResultsComparison } from './components/ResultsComparison';
-import { DPStepThrough } from './components/DPStepThrough';
-import { BenchmarkSuite } from './components/BenchmarkSuite';
-import { WhyDPSection } from './components/WhyDPSection';
-import { TeacherWalkthroughModal } from './components/TeacherWalkthroughModal';
+import { Loader } from './components/Loader';
+import { HeroSection } from './components/HeroSection';
+import { StorySection } from './components/StorySection';
+import { PlaygroundSection } from './components/PlaygroundSection';
+import { BenchmarkSection } from './components/BenchmarkSection';
+import { TheorySection } from './components/TheorySection';
+import { ApplicationsSection } from './components/ApplicationsSection';
+import { Footer } from './components/Footer';
+import { DPStepThroughModal } from './components/DPStepThroughModal';
+import { SelfCheckModal } from './components/SelfCheckModal';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { PRESET_SCENARIOS } from './algorithms/presets';
-import { RouteSolvers } from './algorithms/solvers';
+import { OrienteeringSolvers } from './algorithms/solvers';
+import { useLenisScroll } from './hooks/useLenisScroll';
+import { useCursorEffect } from './hooks/useCursorEffect';
 import { sounds } from './utils/soundEffects';
-import { Dices, Trash2, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 export function App() {
-  const [activeTab, setActiveTab] = useState('canvas'); // 'canvas' | 'dp-stepper' | 'benchmark' | 'why-dp'
-  const [audioEnabled, setAudioEnabled] = useState(true);
-  const [currentPresetId, setCurrentPresetId] = useState('greedy_trap');
-  const [depot, setDepot] = useState({ x: 140, y: 280, name: 'Central Relief Depot' });
-  const [locations, setLocations] = useState([]);
-  const [speed, setSpeed] = useState(120);
-  const [selectedNodeIndex, setSelectedNodeIndex] = useState(-1);
-  const [randomN, setRandomN] = useState(8);
+  // Smooth scroll and custom cursor hooks
+  useLenisScroll();
+  const { cursorRef, trailRef } = useCursorEffect();
 
+  const [isLoading, setIsLoading] = useState(true);
+  const [audioEnabled, setAudioEnabled] = useState(true);
+
+  // Playground state
+  const [currentPresetId, setCurrentPresetId] = useState('scenic_trap');
+  const [depot, setDepot] = useState({ x: 140, y: 260, name: 'Basecamp Hotel' });
+  const [places, setPlaces] = useState([]);
+  const [budget, setBudget] = useState(135);
+  const [speed, setSpeed] = useState(80);
+  const [returnToStart, setReturnToStart] = useState(true);
+  const [selectedNodeIndex, setSelectedNodeIndex] = useState(-1);
+
+  // Solver flags
   const [currentSolver, setCurrentSolver] = useState('dp'); // 'dp' | 'backtracking' | 'greedy'
   const [enablePruning, setEnablePruning] = useState(true);
   const [compareMode, setCompareMode] = useState(false);
   const [activeRoutes, setActiveRoutes] = useState(null);
   const [vehicleAnim, setVehicleAnim] = useState(null);
+
+  // Modals & Toasts
+  const [isStepThroughOpen, setIsStepThroughOpen] = useState(false);
+  const [isSelfCheckOpen, setIsSelfCheckOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
-  const [isTeacherGuideOpen, setIsTeacherGuideOpen] = useState(false);
 
   const showToast = (msg) => {
     setToastMessage(msg);
@@ -39,12 +54,12 @@ export function App() {
     }, 2800);
   };
 
-  const solveAll = useCallback((dep, locs, spd, prune) => {
+  const solveAll = useCallback((dep, locs, spd, bud, ret, prune) => {
     if (!locs || locs.length === 0) {
       setActiveRoutes(null);
       return;
     }
-    const sol = RouteSolvers.solveAll(dep, locs, spd, prune);
+    const sol = OrienteeringSolvers.solveAll(dep, locs, spd, bud, ret, prune);
     setActiveRoutes(sol);
   }, []);
 
@@ -54,73 +69,96 @@ export function App() {
 
     setCurrentPresetId(presetId);
     setDepot({ ...preset.depot });
-    setLocations(preset.locations.map((l) => ({ ...l })));
-    setSpeed(preset.speed || 100);
+    setPlaces(preset.places.map((p) => ({ ...p })));
+    setBudget(preset.budget || 120);
+    setSpeed(preset.speed || 80);
+    setReturnToStart(preset.returnToStart ?? true);
     setSelectedNodeIndex(-1);
     setVehicleAnim(null);
     sounds.playClick();
-    showToast(`Loaded Preset: ${preset.name}`);
+    showToast(`Loaded: ${preset.name}`);
 
-    solveAll(preset.depot, preset.locations, preset.speed || 100, enablePruning);
+    solveAll(
+      preset.depot,
+      preset.places,
+      preset.speed || 80,
+      preset.budget || 120,
+      preset.returnToStart ?? true,
+      enablePruning
+    );
   }, [enablePruning, solveAll]);
 
-  // Initial load
+  // Initial Load with Preset 1
   useEffect(() => {
-    loadPresetById('greedy_trap');
+    loadPresetById('scenic_trap');
   }, []);
 
-  // Re-solve when solver flags or speed change
+  // Re-solve on parameter change
   useEffect(() => {
-    solveAll(depot, locations, speed, enablePruning);
-  }, [depot, locations, speed, enablePruning, solveAll]);
+    solveAll(depot, places, speed, budget, returnToStart, enablePruning);
+  }, [depot, places, speed, budget, returnToStart, enablePruning, solveAll]);
 
-  const handleStateModified = (newLocs, newDepot) => {
-    solveAll(newDepot || depot, newLocs, speed, enablePruning);
+  const handleStateModified = (newPlaces, newDepot) => {
+    solveAll(newDepot || depot, newPlaces, speed, budget, returnToStart, enablePruning);
   };
 
-  const handleGenerateRandom = () => {
+  const handleGenerateRandom = (n = 8) => {
     sounds.playClick();
     const padding = 60;
-    const w = 700;
-    const h = 420;
+    const w = 680;
+    const h = 400;
 
     const newDepot = {
       x: Math.round(padding + Math.random() * (w - 2 * padding)),
       y: Math.round(padding + Math.random() * (h - 2 * padding)),
-      name: 'HQ Relief Hub'
+      name: 'Start Basecamp'
     };
 
-    const types = ['hospital', 'clinic', 'shelter'];
-    const newLocs = [];
+    const categories = ['landmark', 'viewpoint', 'museum', 'park', 'cafe'];
+    const newPlaces = [];
 
-    for (let i = 0; i < randomN; i++) {
-      const weight = Math.floor(Math.random() * 10) + 1;
-      const type = types[Math.floor(Math.random() * types.length)];
-      newLocs.push({
+    for (let i = 0; i < n; i++) {
+      const reward = Math.floor(Math.random() * 10) + 1;
+      const stay = Math.floor(Math.random() * 18) + 6;
+      const cat = categories[Math.floor(Math.random() * categories.length)];
+      newPlaces.push({
         id: i + 1,
-        name: `${type.charAt(0).toUpperCase() + type.slice(1)} #${i + 1}`,
+        name: `${cat.charAt(0).toUpperCase() + cat.slice(1)} #${i + 1}`,
         x: Math.round(padding + Math.random() * (w - 2 * padding)),
         y: Math.round(padding + Math.random() * (h - 2 * padding)),
-        weight,
-        type
+        reward,
+        stayTime: stay,
+        category: cat
       });
     }
 
+    const calculatedBudget = Math.round(110 + n * 14);
     setDepot(newDepot);
-    setLocations(newLocs);
+    setPlaces(newPlaces);
+    setBudget(calculatedBudget);
     setSelectedNodeIndex(-1);
     setVehicleAnim(null);
-    showToast(`Generated random instance with n = ${randomN}`);
-    solveAll(newDepot, newLocs, speed, enablePruning);
+    showToast(`Generated random instance with n = ${n}, Budget = ${calculatedBudget}m`);
+    solveAll(newDepot, newPlaces, speed, calculatedBudget, returnToStart, enablePruning);
   };
 
   const handleClear = () => {
     sounds.playClick();
-    setLocations([]);
+    setPlaces([]);
     setSelectedNodeIndex(-1);
     setVehicleAnim(null);
     setActiveRoutes(null);
     showToast('Canvas cleared');
+  };
+
+  const jumpToPlayground = () => {
+    const el = document.getElementById('playground');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const jumpToTheory = () => {
+    const el = document.getElementById('theory');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
 
   // Keyboard Shortcuts
@@ -130,12 +168,10 @@ export function App() {
 
       if (e.code === 'Space') {
         e.preventDefault();
-        const btn = document.querySelector('.telemetry-ribbon .btn-primary');
-        if (btn) btn.click();
+        const playBtn = document.querySelector('.playback-buttons-group .btn-primary');
+        if (playBtn) playBtn.click();
       } else if (e.key === 'r' || e.key === 'R') {
-        solveAll(depot, locations, speed, enablePruning);
-        sounds.playClick();
-        showToast('Recomputed all routes');
+        handleGenerateRandom(places.length || 8);
       } else if (e.key === 'c' || e.key === 'C') {
         setCompareMode((prev) => !prev);
         sounds.playClick();
@@ -153,173 +189,109 @@ export function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [depot, locations, speed, enablePruning, solveAll]);
-
-  const currentPreset = PRESET_SCENARIOS.find((p) => p.id === currentPresetId);
-  const activeSol = activeRoutes?.[currentSolver] || activeRoutes?.dp || activeRoutes?.greedy;
+  }, [places.length]);
 
   return (
-    <div className="app-container">
+    <div className="budgettrail-app-root">
+      
+      {/* Custom Interactive Cursor */}
+      <div className="custom-cursor-dot" ref={cursorRef} />
+      <div className="custom-cursor-trail" ref={trailRef} />
+
+      {/* Smooth Entrance Loader */}
+      {isLoading && <Loader onFinished={() => setIsLoading(false)} />}
+
+      {/* Floating Pill Navbar */}
       <Navbar
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
         audioEnabled={audioEnabled}
         setAudioEnabled={setAudioEnabled}
-        onOpenTeacherGuide={() => setIsTeacherGuideOpen(false) || setActiveTab('why-dp')}
+        onOpenSelfCheck={() => setIsSelfCheckOpen(true)}
       />
 
-      <main className="main-content">
-        <ErrorBoundary onReset={() => setActiveTab('canvas')}>
-          {activeTab === 'canvas' && (
-            <div className="router-layout-grid">
-              
-              {/* Left Stage */}
-              <section style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem', minWidth: 0 }}>
-                
-                {/* Presets & Random Bento Bar */}
-                <div className="stage-card" style={{ padding: '0.65rem 1rem' }}>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '0.6rem' }}>
-                    
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, minWidth: '260px' }}>
-                      <label htmlFor="preset-select-dropdown" style={{ fontSize: '0.8rem', fontWeight: 700, color: '#fff' }}>Preset:</label>
-                      <select
-                        id="preset-select-dropdown"
-                        className="form-select"
-                        style={{ flex: 1, padding: '0.35rem 0.65rem', fontSize: '0.78rem' }}
-                        value={currentPresetId}
-                        onChange={(e) => loadPresetById(e.target.value)}
-                      >
-                        {PRESET_SCENARIOS.map((p) => (
-                          <option key={p.id} value={p.id}>{p.name}</option>
-                        ))}
-                      </select>
-                    </div>
+      {/* Main Single-Page Sections */}
+      <main className="main-scroll-container">
+        <ErrorBoundary>
+          
+          {/* 1. Hero Section */}
+          <HeroSection onLaunchPlayground={jumpToPlayground} />
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                        <label htmlFor="random-n-field" style={{ fontSize: '0.76rem', color: 'var(--text-secondary)' }}>n =</label>
-                        <input
-                          type="number"
-                          id="random-n-field"
-                          className="form-input"
-                          style={{ width: '48px', padding: '0.35rem 0.2rem', textAlign: 'center', fontSize: '0.78rem' }}
-                          min="3"
-                          max="18"
-                          value={randomN}
-                          onChange={(e) => setRandomN(Number(e.target.value))}
-                        />
-                      </div>
-                      <button className="btn btn-secondary btn-sm" onClick={handleGenerateRandom}>
-                        <Dices size={13} /> Random
-                      </button>
-                      <button className="btn btn-outline btn-sm" onClick={handleClear}>
-                        <Trash2 size={13} /> Clear
-                      </button>
-                    </div>
+          {/* 2. Problem Story Section */}
+          <StorySection onJumpToPlayground={jumpToPlayground} />
 
-                  </div>
+          {/* 3. Main Playground Section (Bento Grid) */}
+          <PlaygroundSection
+            depot={depot}
+            setDepot={setDepot}
+            places={places}
+            setPlaces={setPlaces}
+            budget={budget}
+            setBudget={setBudget}
+            speed={speed}
+            setSpeed={setSpeed}
+            returnToStart={returnToStart}
+            setReturnToStart={setReturnToStart}
+            currentSolver={currentSolver}
+            setCurrentSolver={setCurrentSolver}
+            enablePruning={enablePruning}
+            setEnablePruning={setEnablePruning}
+            compareMode={compareMode}
+            setCompareMode={setCompareMode}
+            selectedNodeIndex={selectedNodeIndex}
+            setSelectedNodeIndex={setSelectedNodeIndex}
+            activeRoutes={activeRoutes}
+            vehicleAnim={vehicleAnim}
+            setVehicleAnim={setVehicleAnim}
+            currentPresetId={currentPresetId}
+            onLoadPreset={loadPresetById}
+            onGenerateRandom={handleGenerateRandom}
+            onClear={handleClear}
+            onOpenStepThrough={() => setIsStepThroughOpen(true)}
+            onOpenSelfCheck={() => setIsSelfCheckOpen(true)}
+            onStateModified={handleStateModified}
+            onJumpToTheory={jumpToTheory}
+          />
 
-                  {currentPreset && (
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
-                      {currentPreset.description}
-                    </div>
-                  )}
-                </div>
+          {/* 4. Neo-Brutalist Benchmark Section */}
+          <BenchmarkSection speed={speed} />
 
-                {/* Interactive Canvas */}
-                <RouterCanvas
-                  depot={depot}
-                  setDepot={setDepot}
-                  locations={locations}
-                  setLocations={setLocations}
-                  selectedNodeIndex={selectedNodeIndex}
-                  setSelectedNodeIndex={setSelectedNodeIndex}
-                  activeRoutes={activeRoutes}
-                  currentSolver={currentSolver}
-                  compareMode={compareMode}
-                  vehicleAnim={vehicleAnim}
-                  setVehicleAnim={setVehicleAnim}
-                  speed={speed}
-                  onStateModified={handleStateModified}
-                />
+          {/* 5. Minimalist Swiss Theory & Proofs Section */}
+          <TheorySection />
 
-                {/* Telemetry & Timeline */}
-                <TelemetryPanel
-                  activeSol={activeSol}
-                  vehicleAnim={vehicleAnim}
-                  setVehicleAnim={setVehicleAnim}
-                  locations={locations}
-                  depot={depot}
-                  speed={speed}
-                />
+          {/* 6. Real-World Applications Infinite Carousel */}
+          <ApplicationsSection />
 
-                {/* Solvers Comparison Results Table */}
-                <ResultsComparison
-                  allSol={activeRoutes}
-                  currentSolver={currentSolver}
-                  onOpenTeacherGuide={() => setActiveTab('why-dp')}
-                />
+          {/* 7. Footer */}
+          <Footer />
 
-              </section>
-
-              {/* Right Sidebar Editor */}
-              <SidebarEditor
-                locations={locations}
-                setLocations={setLocations}
-                selectedNodeIndex={selectedNodeIndex}
-                setSelectedNodeIndex={setSelectedNodeIndex}
-                currentSolver={currentSolver}
-                setCurrentSolver={setCurrentSolver}
-                enablePruning={enablePruning}
-                setEnablePruning={setEnablePruning}
-                compareMode={compareMode}
-                setCompareMode={setCompareMode}
-                speed={speed}
-                setSpeed={setSpeed}
-                onStateModified={handleStateModified}
-                depot={depot}
-              />
-
-            </div>
-          )}
-
-          {activeTab === 'dp-stepper' && (
-            <DPStepThrough
-              depot={depot}
-              locations={locations}
-              speed={speed}
-              onLoadPreset={loadPresetById}
-            />
-          )}
-
-          {activeTab === 'benchmark' && (
-            <BenchmarkSuite speed={speed} />
-          )}
-
-          {activeTab === 'why-dp' && (
-            <WhyDPSection
-              onLoadPreset={loadPresetById}
-              setActiveTab={setActiveTab}
-            />
-          )}
         </ErrorBoundary>
       </main>
 
-      {/* Presentation Walkthrough Modal */}
-      <TeacherWalkthroughModal
-        isOpen={isTeacherGuideOpen}
-        onClose={() => setIsTeacherGuideOpen(false)}
+      {/* DP Bitmask Step-Through Debugger Modal */}
+      <DPStepThroughModal
+        isOpen={isStepThroughOpen}
+        onClose={() => setIsStepThroughOpen(false)}
+        depot={depot}
+        places={places}
+        speed={speed}
+        budget={budget}
+        returnToStart={returnToStart}
         onLoadPreset={loadPresetById}
-        setActiveTab={setActiveTab}
       />
 
-      {/* Floating Toast Notification */}
+      {/* Self-Check 50-Test Verification Suite Modal */}
+      <SelfCheckModal
+        isOpen={isSelfCheckOpen}
+        onClose={() => setIsSelfCheckOpen(false)}
+      />
+
+      {/* Toast Notification */}
       {toastMessage && (
-        <div className="toast-box">
-          <Sparkles size={15} color="#38bdf8" />
+        <div className="spatial-toast-pill">
+          <Sparkles size={15} color="#00f2fe" />
           <span>{toastMessage}</span>
         </div>
       )}
+
     </div>
   );
 }

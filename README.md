@@ -1,139 +1,92 @@
-# 🚑 GoldenHour Router | Minimum Total Weighted Latency Solver
+# 🧭 BudgetTrail — Orienteering Problem Solver & Route Reward Maximizer
 
-An interactive, dark-themed, single-page web application and algorithm visualizer for solving the **Minimum Total Weighted Latency Problem (MWLP)** / **Traveling Repairman Problem with Priority Weights**.
-
-Designed for disaster relief dispatch, mass casualty triage logistics, and algorithmic analysis.
-
----
-
-## 🌟 Key Features
-
-1. **Interactive Command Canvas**:
-   - **Tactical Map**: Click to add hospital, clinic, or shelter nodes; drag to reposition; right-click to delete.
-   - **Visual Urgency Gradient**: Dynamic node sizes and colors reflecting triage weights from $w=1$ (minor/emerald) to $w=10$ (critical trauma/pulsing crimson).
-   - **Depot Radar HQ**: Customizable vehicle speed and real-time path rendering with directional arrows and step ordering.
-   - **5 Curated Presets**: Including the **"Greedy Trap"** scenario demonstrating severe heuristic failure where DP saves critical lives.
-
-2. **Three Algorithmic Solvers (From Scratch in Vanilla JS)**:
-   - **Dynamic Programming with Bitmask** ($\Theta(n^2 \cdot 2^n)$): Exact global optimum using remaining weight incremental penalty formulation with parent reconstruction. Supports $n \le 18$.
-   - **Backtracking with Branch & Bound** ($O(n!)$ worst-case): Depth-first search with admissible lower bounding to prune suboptimal subtrees, plus toggle for naive exhaustive search.
-   - **Greedy Priority Heuristic** ($O(n^2)$): Selects next stop by maximizing $\frac{w_j}{\text{travel\_time}(u, j)}$. Scalable to $n > 500$.
-
-3. **Live Vehicle Simulation & Telemetry**:
-   - Smooth animated emergency drone/ambulance following the route with headlight beams and flashing sirens.
-   - Real-time **Weighted Delay Penalty** counter and live journey step ticker.
-   - Multi-route **Compare Mode** overlaying all three algorithms simultaneously in distinct color-coded traces.
-
-4. **🔍 DP Bitmask Step-Through Inspector ($n \le 5$)**:
-   - Frame-by-frame debugger showing binary bitmasks (e.g., $01101_2$), visited subsets, remaining unvisited weights, incremental penalty calculations, and dynamic cell relaxation in the DP matrix.
-   - Tailored specifically for video presentations and classroom demonstrations.
-
-5. **📊 Empirical Benchmark Suite**:
-   - Multi-trial automated benchmark across increasing $n$ (DP up to 17, B&B up to 11, Greedy up to 500).
-   - Interactive **Chart.js** charts:
-     - Logarithmic Runtime Scaling ($O(n!), O(n^2 2^n), O(n^2)$)
-     - Greedy Optimality Gap % vs $n$
-     - Branch & Bound Pruning Efficiency (Nodes Explored vs $n!$)
-   - **One-Click CSV Export** for research reports.
-
-6. **📚 Comprehensive Theory & Real-World Triage Tab**:
-   - Mathematical proof of the incremental recurrence relation.
-   - Clear distinction between TSP and MWLP.
-   - Full pseudocode and formal time/space complexity proofs.
-   - Practical case studies in emergency ambulance dispatch and medical drone routing.
+> **Design and Analysis of Algorithms (DAA) CIA Project**  
+> A spatial interactive single-page application for the **Orienteering Problem (Selective TSP with Time Budget)** built with React 18, Vite, Framer Motion, GSAP, Lenis, and Chart.js.
 
 ---
 
-## 📁 Project Structure
+## 🌟 1. Project Overview
 
-```
-d:/DAA_CIA/
-├── index.html          # Main single-page application entry point
-├── README.md           # Comprehensive project documentation
-├── css/
-│   ├── style.css       # Design tokens, typography, dark tactical theme
-│   ├── canvas.css      # Canvas HUD, layout, telemetry bar, weight editor
-│   └── dp-stepper.css  # DP debugger, binary mask badges, benchmark charts
-└── js/
-    ├── algorithms.js   # Pure JS DP, Branch & Bound, Greedy solvers & metrics
-    ├── presets.js      # 5 preset test scenarios (Greedy Trap, n=5 Demo, etc.)
-    ├── canvas.js       # High-DPI canvas rendering, node dragging, vehicle animation
-    ├── dp-stepper.js   # Step-by-step DP matrix inspector
-    ├── benchmark.js    # Multi-trial benchmark suite and Chart.js integration
-    └── app.js          # Main UI controller, event listeners, keyboard shortcuts
-```
+In many real-world expeditions, drone surveys, and tourist itineraries, a traveler or autonomous agent **cannot visit all available locations** due to strict time, fuel, or battery limits.
+
+The **Orienteering Problem (OP)** models this scenario:
+* You start at a central **Depot ($v_0$)**.
+* There are $n$ candidate destinations $V = \{v_1, v_2, \dots, v_n\}$, each with:
+  1. A geographic coordinate $(x_i, y_i)$.
+  2. A **Reward $r_i \in [1, 10]$** collected upon visiting.
+  3. A **Stay Time $s_i$ (minutes)** required at the location.
+* A total travel **Time Budget $B$** is given.
+* **Objective:** Select a subset of destinations and a visiting sequence to **MAXIMIZE total collected reward** such that $(\text{Travel Time} + \text{Stay Time} + \text{Return Time}) \le B$.
 
 ---
 
-## 🚀 How to Run
+## 🚀 2. Quick Start & Installation
 
-### Option 1: Direct File Opening (No Installation Required)
-Simply double-click `index.html` or open it in any modern browser (Chrome, Firefox, Edge, Safari).
-
-### Option 2: Local HTTP Server (Optional)
 ```bash
-# Using Python 3
-python -m http.server 8000
+# 1. Clone the repository
+git clone https://github.com/shariya-ai/daa.git
+cd daa
 
-# Using Node / npx
-npx serve .
+# 2. Install dependencies
+npm install
+
+# 3. Start local development server
+npm run dev
+
+# 4. Build for production
+npm run build
 ```
-Then navigate to `http://localhost:8000` in your web browser.
 
 ---
 
-## ⌨️ Keyboard Shortcuts
+## 🧠 3. Algorithms Implemented
 
-| Shortcut | Action |
-| :--- | :--- |
-| <kbd>Space</kbd> | Start / Pause vehicle route animation |
-| <kbd>R</kbd> | Recompute and solve all algorithms |
-| <kbd>C</kbd> | Toggle multi-route Comparison Mode |
-| <kbd>1</kbd> | Switch active route to **Dynamic Programming** |
-| <kbd>2</kbd> | Switch active route to **Branch & Bound** |
-| <kbd>3</kbd> | Switch active route to **Greedy Heuristic** |
+### 🟢 1. Bitmask Dynamic Programming ($\Theta(n^2 \cdot 2^n)$) — *Exact Optimal Solver*
+* **State Definition:** $\text{DP}[\text{mask}][\text{last}]$ = minimum time required to visit the subset represented by `mask`, ending at destination `last`.
+* **Recurrence Relation:**
+  $$\text{DP}[S \cup \{v\}][v] = \min_{u \in S} \Big( \text{DP}[S][u] + \text{travel\_time}(u, v) + s_v \Big)$$
+* **Optimal Reward Selection:**
+  $$\text{MaxReward} = \max_{\text{mask}} \sum_{i \in \text{mask}} r_i \quad \text{s.t.} \quad \min_{u \in \text{mask}} (\text{DP}[\text{mask}][u] + \text{return}(u)) \le B$$
+* **Space Complexity:** $\Theta(n \cdot 2^n)$ using contiguous `Float64Array` and predecessor table for $O(n)$ path reconstruction. Capped at $n \le 17$.
 
----
+### 🔵 2. Backtracking with Branch & Bound ($O(n!)$) — *Exact Search with Pruning*
+* Recursive Depth-First Search with two aggressive pruning rules:
+  1. **Feasibility Pruning:** Prune if $\text{CurrentTime} + \text{travel}(u, v) + s_v + \text{return}(v) > B$.
+  2. **Upper-Bound Pruning:** Prune if $\text{CurrentReward} + \sum_{k \in \text{Unvisited}} r_k \le \text{BestRewardFoundSoFar}$.
+* Can be toggled on/off to visualize the exponential node explosion of naive backtracking.
 
-## 📐 Mathematical Formulation
-
-### Objective Function
-Given $n$ locations with positions $p_i = (x_i, y_i)$ and weights $w_i \in [1, 10]$ departing depot $p_0$ at $t = 0$:
-
-$$\min_{\pi \in S_n} \sum_{i=1}^n w_{\pi(i)} \cdot A(\pi(i))$$
-
-$$\text{where } A(\pi(i)) = \sum_{k=1}^i \frac{\|p_{\pi(k-1)} - p_{\pi(k)}\|_2}{\text{speed}}$$
-
-### Dynamic Programming Incremental Recurrence
-Let bitmask $S \subseteq \{1, \dots, n\}$ represent the subset of visited locations, and let $u \in S$ be the last visited location:
-
-$$DP[S \cup \{v\}][v] = \min_{u \in S} \Big( DP[S][u] + \text{travel\_time}(u, v) \times \sum_{k \notin S} w_k \Big)$$
-
-$$\text{Base Case: } DP[\{v\}][v] = \text{travel\_time}(\text{depot}, v) \times \sum_{i=1}^n w_i \quad \forall v$$
+### 🟡 3. Greedy Heuristic ($O(n^2)$) — *Fast Ratio Heuristic*
+* At each step, selects the feasible unvisited destination maximizing the ratio:
+  $$\text{Score}(v) = \frac{\text{Reward}(v)}{\text{TravelTime}(\text{curr}, v) + s_v}$$
+* Vulnerable to "Greedy Traps" where it consumes budget on low-reward local clusters, resulting in **10% to 40% suboptimality** compared to DP.
 
 ---
 
-## 📊 Complexity Comparison Table
+## 🎯 4. The 5 Preset Test Scenarios
 
-| Algorithm | Time Complexity | Space Complexity | Optimality Guarantee |
-| :--- | :--- | :--- | :--- |
-| **Bitmask DP** | $\Theta(n^2 \cdot 2^n)$ | $\Theta(n \cdot 2^n)$ | **Exact Global Minimum** |
-| **Branch & Bound (B&B)** | $O(n!)$ worst, $O(c^n)$ avg | $O(n)$ call stack | **Exact Global Minimum** |
-| **Naive Backtracking** | $\Theta(n!)$ | $O(n)$ | **Exact Global Minimum** |
-| **Greedy Heuristic** | $O(n^2)$ | $O(n)$ | Suboptimal ($>20\%$ gap on trap cases) |
-
----
-
-## 🧪 Preset Test Cases
-
-1. **🚨 The Greedy Trap**: Low-urgency clinics cluster close to the depot while high-urgency trauma centers are further away. Greedy visits the nearby clinics first, causing catastrophic delays for critical patients. DP routes directly to the critical center, achieving $\sim 25\%$ lower weighted penalty.
-2. **🔍 Small Demo (n = 5)**: Specifically calibrated for the **DP Step-Through** inspector (32 bitmask states) for crystal-clear video walkthroughs.
-3. **🏙️ Dual-Cluster Urban Outbreak (n = 8)**: Tests inter-cluster vs intra-cluster dispatch.
-4. **⚡ Critical Highway Corridor (n = 7)**: Linear chain topology with frontier emergency center.
-5. **🏥 Mass Casualty Field Triage (n = 12)**: Complex multi-facility disaster layout testing full solver scaling.
+1. **The Scenic Tour Trap (Greedy Trap):**
+   * A nearby cluster of 4 low-reward cafes ($R=2$, Stay=$12\text{m}$) vs distant high-value summits ($R=10, 9$). Greedy scores only 8 points; DP scores **28 points (+250% higher!)**.
+2. **Strict Time Crunch:**
+   * Razor-thin 65-minute budget testing return-to-depot closing constraints.
+3. **Metropolis Sightseeing Marathon ($n=12$):**
+   * Diverse spread of 12 landmarks across 4 city quadrants with varied stay times.
+4. **Step-Through Mini Demo ($n=4$):**
+   * Configured specifically for the 16-row Bitmask DP Matrix debugger.
+5. **Drone Survey Relay ($n=14$):**
+   * Battery-limited UAV autonomous sensor node harvesting.
 
 ---
 
-## 👨‍💻 Author & Repository
-- **GitHub Repository**: [https://github.com/dakshshah05/daa.git](https://github.com/dakshshah05/daa.git)
-- **Coursework**: Design & Analysis of Algorithms (DAA) CIA Project.
+## 🧪 5. In-App Self-Check Verification Suite
+
+Click the **"Self-Check (50)"** button in the navbar to run 50 randomized small instances ($n \in [3, 7]$) in real time. The suite automatically asserts that Bitmask DP and Branch & Bound output **identical global maximum rewards**, proving mathematical correctness.
+
+---
+
+## 📊 6. Complexity Summary
+
+| Algorithm | Time Complexity | Space Complexity | Optimality Guarantee | Practical Scale |
+|---|---|---|---|---|
+| **Bitmask DP** | $\mathbf{\Theta(n^2 \cdot 2^n)}$ | $\mathbf{\Theta(n \cdot 2^n)}$ | ✅ **100% Exact Global Maximum** | $n \le 17$ (Instant) |
+| **Branch & Bound** | $O(n!)$ worst | $O(n)$ call stack | ✅ **100% Exact Global Maximum** | $n \le 12$ |
+| **Greedy Ratio** | $O(n^2)$ | $O(n)$ | ❌ Suboptimal ($10\text{--}40\%$ gap) | $n \le 10,000+$ |
