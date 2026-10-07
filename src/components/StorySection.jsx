@@ -52,20 +52,20 @@ export function StorySection({ onJumpToPlayground }) {
           </p>
           <div className="story-param-grid">
             <div className="param-item">
-              <span className="param-title">🏁 Depot ($v_0$)</span>
-              <span className="param-desc">Start and optional return point with $(x_0, y_0)$ coordinates.</span>
+              <span className="param-title">{"🏁 Depot (v₀)"}</span>
+              <span className="param-desc">{"Start and optional return point with (x₀, y₀) coordinates."}</span>
             </div>
             <div className="param-item">
-              <span className="param-title">💎 Rewards ($r_i \in [1, 10]$)</span>
-              <span className="param-desc">Score or priority value collected upon visiting location $i$.</span>
+              <span className="param-title">{"💎 Rewards (rᵢ ∈ [1, 10])"}</span>
+              <span className="param-desc">{"Score or priority value collected upon visiting location i."}</span>
             </div>
             <div className="param-item">
-              <span className="param-title">⏱️ Stay Times ($s_i$)</span>
-              <span className="param-desc">Mandatory service or sightseeing queue duration at place $i$.</span>
+              <span className="param-title">{"⏱️ Stay Times (sᵢ)"}</span>
+              <span className="param-desc">{"Mandatory service or sightseeing queue duration at place i."}</span>
             </div>
             <div className="param-item">
-              <span className="param-title">⏳ Total Budget ($B$)</span>
-              <span className="param-desc">Hard ceiling on combined travel time and stay durations.</span>
+              <span className="param-title">{"⏳ Total Budget (B)"}</span>
+              <span className="param-desc">{"Hard ceiling on combined travel time and stay durations."}</span>
             </div>
           </div>
         </div>
@@ -80,16 +80,16 @@ export function StorySection({ onJumpToPlayground }) {
       content: (
         <div className="story-card-body">
           <p>
-            The goal is to select an ordered sequence of places $P = (p_1, p_2, \dots, p_k)$ to:
+            {"The goal is to select an ordered sequence of places P = (p₁, p₂, ..., pₖ) to:"}
           </p>
           <div className="story-formula-card">
             <div className="formula-header">🎯 Objective Function:</div>
             <div className="formula-math">
-              $$\text{Maximize } \sum_{i=1}^{k} \text{Reward}(p_i)$$
+              {"Maximize ∑ [i=1 to k] Reward(pᵢ)"}
             </div>
             <div className="formula-header" style={{ marginTop: '0.75rem' }}>⛓️ Subject to Budget Constraint:</div>
             <div className="formula-math-sub">
-              $$t(v_0, p_1) + s_{p_1} + \sum_{i=2}^{k} \big( t(p_{i-1}, p_i) + s_{p_i} \big) + t(p_k, v_0) \le B$$
+              {"t(v₀, p₁) + s(p₁) + ∑ [i=2..k] (t(p_{i-1}, pᵢ) + s(pᵢ)) + t(pₖ, v₀) ≤ B"}
             </div>
           </div>
           <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
@@ -108,16 +108,16 @@ export function StorySection({ onJumpToPlayground }) {
         <div className="story-card-body">
           <div className="story-solvers-comparison">
             <div className="solver-preview-box winner">
-              <div className="solver-badge"><CheckCircle2 size={13} color="#10b981" /> Bitmask DP ($\Theta(n^2 \cdot 2^n)$)</div>
-              <p>Memoizes shortest times for all $2^n \times n$ subproblems. Guaranteed global optimal reward.</p>
+              <div className="solver-badge"><CheckCircle2 size={13} color="#10b981" /> {"Bitmask DP (Θ(n² · 2ⁿ))"}</div>
+              <p>{"Memoizes shortest times for all 2ⁿ × n subproblems. Guaranteed global optimal reward."}</p>
             </div>
             <div className="solver-preview-box">
-              <div className="solver-badge"><CheckCircle2 size={13} color="#06b6d4" /> Branch & Bound ($O(n!)$)</div>
-              <p>Recursive DFS with upper bound and time budget pruning. Exact, but factorially slow for large $n$.</p>
+              <div className="solver-badge"><CheckCircle2 size={13} color="#06b6d4" /> {"Branch & Bound (O(n!))"}</div>
+              <p>{"Recursive DFS with upper bound and time budget pruning. Exact, but factorially slow for large n."}</p>
             </div>
             <div className="solver-preview-box">
-              <div className="solver-badge"><XCircle size={13} color="#f59e0b" /> Greedy Heuristic (O(n²))</div>
-              <p>Greedily grabs max (Reward / Travel Time) next stop. Fast, but vulnerable to local traps.</p>
+              <div className="solver-badge"><XCircle size={13} color="#f59e0b" /> {"Greedy Heuristic (O(n²))"}</div>
+              <p>{"Greedily grabs max (Reward / Travel Time) next stop. Fast, but vulnerable to local traps."}</p>
             </div>
           </div>
 

@@ -84,9 +84,7 @@ export function HeroSection({ onLaunchPlayground }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          When visiting all destinations is mathematically impossible due to finite time or battery limits, 
-          <strong> BudgetTrail</strong> employs <strong>Bitmask Dynamic Programming</strong> ($\Theta(n^2 \cdot 2^n)$) and 
-          <strong> Branch & Bound</strong> to discover the exact global reward-maximizing tour.
+          {"When visiting all destinations is mathematically impossible due to finite time or battery limits, BudgetTrail employs Bitmask Dynamic Programming (Θ(n² · 2ⁿ)) and Branch & Bound to discover the exact global reward-maximizing tour."}
         </motion.p>
 
         {/* Key Features Metric Grid */}
@@ -99,7 +97,7 @@ export function HeroSection({ onLaunchPlayground }) {
           <div className="hero-metric-card">
             <div className="metric-icon cyan"><Cpu size={18} /></div>
             <div className="metric-data">
-              <span className="metric-num">$\Theta(n^2 \cdot 2^n)$</span>
+              <span className="metric-num">{"Θ(n² · 2ⁿ)"}</span>
               <span className="metric-lbl">Bitmask DP Complexity</span>
             </div>
           </div>

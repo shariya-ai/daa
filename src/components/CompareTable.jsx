@@ -47,7 +47,7 @@ export function CompareTable({ allSol, currentSolver, budget, onJumpToTheory }) 
           <thead>
             <tr>
               <th>Algorithm</th>
-              <th>Total Reward ($\max \sum r_i$)</th>
+              <th>Total Reward (Max ∑ rᵢ)</th>
               <th>Time Used / Budget</th>
               <th>Runtime</th>
               <th>Nodes / States</th>
