@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Compass, Play, Sparkles, ArrowDown, MapPin, Gauge, ShieldCheck, Zap } from 'lucide-react';
+import { Compass, Play, Sparkles, ArrowDown, MapPin, Gauge, ShieldCheck, Zap, Cpu } from 'lucide-react';
 import { sounds } from '../utils/soundEffects';
 
 export function HeroSection({ onLaunchPlayground }) {

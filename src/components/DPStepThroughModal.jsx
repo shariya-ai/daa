@@ -110,7 +110,7 @@ export function DPStepThroughModal({ isOpen, onClose, depot, places, speed, budg
             </div>
             <div>
               <h3 className="modal-title">Bitmask DP Step-Through Matrix Visualizer</h3>
-              <p className="modal-subtitle">State: $\text{DP}[\text{mask}][\text{last}]$ — Minimum time to visit subset $\text{mask}$ ending at $\text{last}$</p>
+              <p className="modal-subtitle">{"State: DP[mask][last] — Minimum time to visit subset mask ending at last"}</p>
             </div>
           </div>
           <button className="modal-close-btn" onClick={onClose} title="Close Visualizer">
@@ -121,9 +121,9 @@ export function DPStepThroughModal({ isOpen, onClose, depot, places, speed, budg
         {isTooLarge ? (
           <div className="modal-body-warning">
             <AlertCircle size={44} color="#f59e0b" />
-            <h4>Step-Through Visualizer is configured for $n \le 5$</h4>
+            <h4>{"Step-Through Visualizer is configured for n ≤ 5"}</h4>
             <p>
-              Your active map has <strong>$n = {n}$</strong> places ($2^{n} = {1 << n}$ matrix rows). 
+              Your active map has <strong>n = {n}</strong> places (2<sup>{n}</sup> = {1 << n} matrix rows). 
               For clear academic presentation and tabular video recording, load the 4-node demo scenario.
             </p>
             <button
