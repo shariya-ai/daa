@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { PRESET_SCENARIOS } from '../algorithms/presets';
-import { Sparkles, ChevronLeft, ChevronRight, Compass, Clock, MapPin } from 'lucide-react';
+import { Sparkles, ChevronLeft, ChevronRight, Compass, Clock, MapPin, CheckCircle2, ArrowRight } from 'lucide-react';
 import { sounds } from '../utils/soundEffects';
 
 export function Preset3DDome({ currentPresetId, onLoadPreset }) {
@@ -25,86 +25,102 @@ export function Preset3DDome({ currentPresetId, onLoadPreset }) {
     handleSelectPreset(nextIdx);
   };
 
+  const curPreset = PRESET_SCENARIOS[activeIdx] || PRESET_SCENARIOS[0];
+
   return (
     <div className="dome-gallery-wrapper">
       <div className="dome-gallery-topbar">
         <div className="dome-title">
           <Sparkles size={16} color="#00f2fe" />
-          <span>3D Preset Dome Gallery — 5 Rigorous Test Cases</span>
+          <span>Preset Scenario Gallery — 5 Academic Test Benches</span>
         </div>
         <div className="dome-nav-arrows">
-          <button className="dome-arrow-btn" onClick={handlePrev} title="Previous Preset">
+          <button className="dome-arrow-btn" onClick={handlePrev} title="Previous Scenario" aria-label="Previous Scenario">
             <ChevronLeft size={16} />
           </button>
           <span className="dome-counter">{activeIdx + 1} / {PRESET_SCENARIOS.length}</span>
-          <button className="dome-arrow-btn" onClick={handleNext} title="Next Preset">
+          <button className="dome-arrow-btn" onClick={handleNext} title="Next Scenario" aria-label="Next Scenario">
             <ChevronRight size={16} />
           </button>
         </div>
       </div>
 
-      {/* 3D Rotating Dome Deck */}
-      <div className="dome-stage-3d">
-        <div className="dome-cards-carousel">
-          {PRESET_SCENARIOS.map((preset, idx) => {
-            const offset = idx - activeIdx;
-            const isActive = idx === activeIdx;
+      {/* Preset Quick Tabs */}
+      <div className="preset-tabs-bar">
+        {PRESET_SCENARIOS.map((p, idx) => {
+          const isActive = idx === activeIdx;
+          return (
+            <button
+              key={p.id}
+              className={`preset-pill-tab ${isActive ? 'active' : ''}`}
+              onClick={() => handleSelectPreset(idx)}
+            >
+              <span className="pill-dot" style={{ background: p.color }} />
+              <span className="pill-title">{p.name.split('(')[0]}</span>
+              {isActive && <CheckCircle2 size={12} color="#00f2fe" />}
+            </button>
+          );
+        })}
+      </div>
 
-            // Compute 3D transform for circular dome arrangement
-            const rotateY = offset * 24;
-            const translateZ = isActive ? 0 : -Math.abs(offset) * 60;
-            const translateX = offset * 220;
-            const opacity = Math.max(0.25, 1 - Math.abs(offset) * 0.35);
-
-            return (
-              <div
-                key={preset.id}
-                className={`dome-card ${isActive ? 'active' : ''}`}
+      {/* Active Spotlight Scenario Card */}
+      <div className="preset-spotlight-stage">
+        <div className="preset-spotlight-card">
+          <div className="spotlight-header">
+            <div className="spotlight-title-group">
+              <span
+                className="dome-card-tag"
                 style={{
-                  transform: `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg)`,
-                  opacity,
-                  zIndex: 10 - Math.abs(offset)
+                  color: curPreset.color,
+                  borderColor: `${curPreset.color}60`,
+                  background: `${curPreset.color}18`
                 }}
-                onClick={() => handleSelectPreset(idx)}
               >
-                <div className="dome-card-header">
-                  <span className="dome-card-tag" style={{ color: preset.color, borderColor: `${preset.color}50`, background: `${preset.color}15` }}>
-                    {preset.tag}
-                  </span>
-                  <div className="dome-card-places-count">
-                    <MapPin size={12} /> {preset.places.length} Spots
-                  </div>
-                </div>
-
-                <h4 className="dome-card-name">{preset.name}</h4>
-                <p className="dome-card-desc">{preset.description}</p>
-
-                <div className="dome-card-specs">
-                  <div className="spec-item">
-                    <Clock size={12} color="#00f2fe" />
-                    <span>Budget: <strong>{preset.budget}m</strong></span>
-                  </div>
-                  <div className="spec-item">
-                    <Compass size={12} color="#8b5cf6" />
-                    <span>Return: <strong>{preset.returnToStart ? 'Yes' : 'No'}</strong></span>
-                  </div>
-                </div>
-
-                <button
-                  className={`btn btn-sm ${isActive ? 'btn-primary' : 'btn-outline'}`}
-                  style={{ width: '100%', marginTop: '0.75rem' }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleSelectPreset(idx);
-                  }}
-                >
-                  {isActive ? '✓ Loaded on Map' : 'Load Scenario'}
-                </button>
+                {curPreset.tag}
+              </span>
+              <h3 className="spotlight-name">{curPreset.name}</h3>
+            </div>
+            
+            <div className="spotlight-meta-pills">
+              <div className="meta-pill">
+                <MapPin size={13} color="#00f2fe" />
+                <span><strong>{curPreset.places.length}</strong> Destinations</span>
               </div>
-            );
-          })}
+              <div className="meta-pill">
+                <Clock size={13} color="#f59e0b" />
+                <span>Budget: <strong>{curPreset.budget} min</strong></span>
+              </div>
+              <div className="meta-pill">
+                <Compass size={13} color="#a855f7" />
+                <span>Return to Depot: <strong>{curPreset.returnToStart ? 'Yes (Loop)' : 'No (Open)'}</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <p className="spotlight-desc">{curPreset.description}</p>
+
+          <div className="spotlight-footer">
+            <div className="spotlight-places-preview">
+              <span className="places-preview-lbl">Locations Included:</span>
+              <div className="places-tags-wrap">
+                {curPreset.places.map((place, pIdx) => (
+                  <span key={pIdx} className="place-preview-chip">
+                    {place.name} <small>+{place.reward}R</small>
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <button
+              className="btn btn-primary spotlight-load-btn"
+              onClick={() => handleSelectPreset(activeIdx)}
+            >
+              <CheckCircle2 size={16} /> Load Scenario on Map Canvas <ArrowRight size={14} />
+            </button>
+          </div>
         </div>
       </div>
     </div>
   );
 }
+

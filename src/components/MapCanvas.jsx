@@ -475,36 +475,73 @@ export function MapCanvas({
           ctx.translate(vx, vy);
           ctx.rotate(angle);
 
-          // Headlight Beam
-          const grad = ctx.createRadialGradient(10, 0, 2, 45, 0, 35);
-          grad.addColorStop(0, 'rgba(0, 242, 254, 0.65)');
+          // Forward Trail Scanner Beam
+          const grad = ctx.createRadialGradient(8, 0, 2, 50, 0, 38);
+          grad.addColorStop(0, 'rgba(0, 242, 254, 0.7)');
+          grad.addColorStop(0.6, 'rgba(0, 242, 254, 0.2)');
           grad.addColorStop(1, 'rgba(0, 242, 254, 0)');
           ctx.fillStyle = grad;
           ctx.beginPath();
-          ctx.moveTo(10, -8);
-          ctx.lineTo(45, -22);
-          ctx.lineTo(45, 22);
-          ctx.lineTo(10, 8);
+          ctx.moveTo(8, -6);
+          ctx.lineTo(50, -25);
+          ctx.lineTo(50, 25);
+          ctx.lineTo(8, 6);
           ctx.closePath();
           ctx.fill();
 
-          // Rover Body
-          ctx.fillStyle = '#f8fafc';
-          ctx.shadowColor = '#00f2fe';
-          ctx.shadowBlur = 16;
+          // Outer Scout Pulse Aura
+          const scoutPulse = Math.sin(animPhaseRef.current * 3) * 2;
           ctx.beginPath();
-          ctx.roundRect(-16, -9, 32, 18, [4, 8, 8, 4]);
-          ctx.fill();
-          ctx.strokeStyle = '#0284c7';
-          ctx.lineWidth = 1.8;
+          ctx.arc(0, 0, 14 + scoutPulse, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(0, 242, 254, 0.4)';
+          ctx.lineWidth = 1.5;
           ctx.stroke();
 
-          // Glowing Drone Sensor Beacon
+          // Scout Drone Cross Wings
+          ctx.strokeStyle = '#00f2fe';
+          ctx.lineWidth = 2;
           ctx.beginPath();
-          ctx.arc(2, 0, 4, 0, Math.PI * 2);
-          ctx.fillStyle = '#00f2fe';
+          // Thruster wing diagonal 1
+          ctx.moveTo(-10, -10);
+          ctx.lineTo(10, 10);
+          // Thruster wing diagonal 2
+          ctx.moveTo(-10, 10);
+          ctx.lineTo(10, -10);
+          ctx.stroke();
+
+          // Thruster Pods (4 dots)
+          const pods = [
+            { x: -10, y: -10 },
+            { x: 10, y: -10 },
+            { x: 10, y: 10 },
+            { x: -10, y: 10 }
+          ];
+          ctx.fillStyle = '#38bdf8';
+          pods.forEach((p) => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+          });
+
+          // Center Navigator Orb Core
+          ctx.beginPath();
+          ctx.arc(0, 0, 7, 0, Math.PI * 2);
+          ctx.fillStyle = '#0a0f1d';
           ctx.shadowColor = '#00f2fe';
-          ctx.shadowBlur = 12;
+          ctx.shadowBlur = 14;
+          ctx.fill();
+          ctx.strokeStyle = '#00f2fe';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          // Center Compass Pointer Needle
+          ctx.beginPath();
+          ctx.moveTo(6, 0);
+          ctx.lineTo(-3, -3);
+          ctx.lineTo(-1, 0);
+          ctx.lineTo(-3, 3);
+          ctx.closePath();
+          ctx.fillStyle = '#00f2fe';
           ctx.fill();
 
           ctx.restore();
