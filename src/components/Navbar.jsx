@@ -11,8 +11,7 @@ import {
   VolumeX, 
   Github, 
   Menu, 
-  X,
-  Sparkles
+  X
 } from 'lucide-react';
 import { sounds } from '../utils/soundEffects';
 
@@ -73,7 +72,7 @@ export function Navbar({ audioEnabled, setAudioEnabled, onOpenSelfCheck }) {
           {/* Brand */}
           <div className="nav-brand" onClick={() => scrollToSection('hero')}>
             <div className="nav-brand-icon">
-              <Compass size={20} className="brand-compass" />
+              <Compass size={18} className="brand-compass" />
             </div>
             <div className="nav-brand-text">
               <span className="brand-name">BudgetTrail</span>
@@ -94,7 +93,7 @@ export function Navbar({ audioEnabled, setAudioEnabled, onOpenSelfCheck }) {
                   role="tab"
                   aria-selected={isActive}
                 >
-                  <Icon size={14} />
+                  <Icon size={13} />
                   <span>{item.label}</span>
                 </button>
               );
@@ -112,8 +111,8 @@ export function Navbar({ audioEnabled, setAudioEnabled, onOpenSelfCheck }) {
               }}
               title="Run 50-Instance Verification Suite (DP vs B&B)"
             >
-              <CheckCircle size={14} color="#4C4541" />
-              <span>Self-Check (50)</span>
+              <CheckCircle size={13} color="#4C4541" />
+              <span>Self-Check</span>
             </button>
 
             {/* Audio Toggle */}
@@ -123,7 +122,7 @@ export function Navbar({ audioEnabled, setAudioEnabled, onOpenSelfCheck }) {
               title={audioEnabled ? 'Mute Audio Synth' : 'Enable Audio Synth'}
               aria-label="Toggle Audio"
             >
-              {audioEnabled ? <Volume2 size={16} color="#4C4541" /> : <VolumeX size={16} color="rgba(76,69,65,0.5)" />}
+              {audioEnabled ? <Volume2 size={15} color="#4C4541" /> : <VolumeX size={15} color="rgba(76,69,65,0.5)" />}
             </button>
 
             {/* GitHub */}
@@ -135,7 +134,7 @@ export function Navbar({ audioEnabled, setAudioEnabled, onOpenSelfCheck }) {
               title="GitHub Repository"
               aria-label="GitHub Repository"
             >
-              <Github size={16} />
+              <Github size={15} />
             </a>
 
             {/* Mobile Hamburger */}
@@ -144,7 +143,7 @@ export function Navbar({ audioEnabled, setAudioEnabled, onOpenSelfCheck }) {
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle Navigation Menu"
             >
-              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
           </div>
 
