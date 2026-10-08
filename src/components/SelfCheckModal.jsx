@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { OrienteeringSolvers } from '../algorithms/solvers';
-import { CheckCircle2, XCircle, Play, X, ShieldCheck, Sparkles, RefreshCw } from 'lucide-react';
+import { CheckCircle2, XCircle, Play, X, ShieldCheck, RefreshCw } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { sounds } from '../utils/soundEffects';
 
@@ -16,7 +16,6 @@ export function SelfCheckModal({ isOpen, onClose }) {
     setProgress(0);
     sounds.playClick();
 
-    // Run tests in chunks with yielding to avoid locking UI
     const totalTests = 50;
     const testRecords = [];
     let passed = 0;
@@ -26,7 +25,7 @@ export function SelfCheckModal({ isOpen, onClose }) {
       await new Promise((r) => setTimeout(r, 12));
       setProgress(Math.round((i / totalTests) * 100));
 
-      const n = Math.floor(Math.random() * 4) + 3; // 3 to 6 places
+      const n = Math.floor(Math.random() * 4) + 3;
       const speed = Math.floor(Math.random() * 40) + 60;
       const budget = Math.floor(Math.random() * 150) + 90;
       const returnToStart = Math.random() > 0.3;
@@ -81,7 +80,8 @@ export function SelfCheckModal({ isOpen, onClose }) {
       confetti({
         particleCount: 70,
         spread: 70,
-        origin: { y: 0.7 }
+        origin: { y: 0.7 },
+        colors: ['#4C4541', '#F2C46A', '#AEAC78', '#FCF0DA']
       });
     }
   };
@@ -94,7 +94,7 @@ export function SelfCheckModal({ isOpen, onClose }) {
         <div className="modal-top-bar">
           <div className="modal-title-box">
             <div className="modal-icon-glow">
-              <ShieldCheck size={20} color="#10b981" />
+              <ShieldCheck size={20} color="#4C4541" />
             </div>
             <div>
               <h3 className="modal-title">Self-Check Verification Suite (50 Automated Tests)</h3>
@@ -163,9 +163,9 @@ export function SelfCheckModal({ isOpen, onClose }) {
                       <td><strong>#{t.id}</strong></td>
                       <td>n = {t.n}</td>
                       <td>{t.budget}m</td>
-                      <td style={{ color: '#00f2fe', fontWeight: 700 }}>+{t.dpReward}</td>
-                      <td style={{ color: '#8b5cf6', fontWeight: 700 }}>+{t.bbReward}</td>
-                      <td style={{ color: '#f59e0b' }}>+{t.greedyReward}</td>
+                      <td style={{ fontWeight: 700 }}>+{t.dpReward}</td>
+                      <td style={{ fontWeight: 700 }}>+{t.bbReward}</td>
+                      <td>+{t.greedyReward}</td>
                       <td>
                         {t.passed ? (
                           <span className="badge badge-success"><CheckCircle2 size={11} /> MATCH</span>

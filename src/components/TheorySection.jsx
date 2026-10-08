@@ -4,15 +4,8 @@ import {
   BookOpen, 
   Cpu, 
   Clock, 
-  Layers, 
-  CheckCircle2, 
-  XCircle, 
   ChevronDown, 
-  ChevronUp, 
-  Code2, 
-  Sparkles,
-  Calculator,
-  Scale
+  ChevronUp
 } from 'lucide-react';
 import { sounds } from '../utils/soundEffects';
 
@@ -122,7 +115,7 @@ export function TheorySection() {
                 
                 {/* Time Derivation */}
                 <div className="derivation-unit">
-                  <h4 className="derivation-heading" style={{ color: '#00f2fe' }}>
+                  <h4 className="derivation-heading" style={{ color: '#4C4541' }}>
                     <Clock size={16} /> 1. Time Complexity: {THEORY_DATA.complexityDerivations.time.formula}
                   </h4>
                   <ol className="derivation-list">
@@ -134,7 +127,7 @@ export function TheorySection() {
 
                 {/* Space Derivation */}
                 <div className="derivation-unit">
-                  <h4 className="derivation-heading" style={{ color: '#8b5cf6' }}>
+                  <h4 className="derivation-heading" style={{ color: '#4C4541' }}>
                     <Cpu size={16} /> 2. Space Complexity: {THEORY_DATA.complexityDerivations.space.formula}
                   </h4>
                   <ol className="derivation-list">
@@ -214,17 +207,17 @@ export function TheorySection() {
                   <thead>
                     <tr>
                       <th>Evaluation Metric</th>
-                      <th style={{ color: '#00f2fe' }}>Bitmask Dynamic Programming</th>
-                      <th style={{ color: '#8b5cf6' }}>Branch & Bound</th>
-                      <th style={{ color: '#f59e0b' }}>Greedy Ratio Heuristic</th>
+                      <th style={{ color: '#4C4541' }}>Bitmask Dynamic Programming</th>
+                      <th style={{ color: '#4C4541' }}>Branch & Bound</th>
+                      <th style={{ color: '#4C4541' }}>Greedy Ratio Heuristic</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
                       <td><strong>Reward Optimality</strong></td>
-                      <td style={{ color: '#00f2fe', fontWeight: 700 }}>✅ 100% Exact Global Maximum</td>
-                      <td style={{ color: '#8b5cf6', fontWeight: 700 }}>✅ 100% Exact Global Maximum</td>
-                      <td style={{ color: '#ef4444' }}>❌ Suboptimal (10-40% Reward Gap)</td>
+                      <td style={{ color: '#4C4541', fontWeight: 700 }}>✅ 100% Exact Global Maximum</td>
+                      <td style={{ color: '#4C4541', fontWeight: 700 }}>✅ 100% Exact Global Maximum</td>
+                      <td style={{ color: '#4C4541' }}>❌ Suboptimal (10-40% Reward Gap)</td>
                     </tr>
                     <tr>
                       <td><strong>Time Complexity</strong></td>
@@ -240,19 +233,19 @@ export function TheorySection() {
                     </tr>
                     <tr>
                       <td><strong>Runtime Predictability</strong></td>
-                      <td style={{ color: '#00f2fe' }}>✅ Deterministic (No spikes)</td>
-                      <td style={{ color: '#ef4444' }}>❌ Highly erratic ($O(n!)$ traps)</td>
-                      <td style={{ color: '#00f2fe' }}>✅ Instant (&lt; 1 ms)</td>
+                      <td style={{ color: '#4C4541' }}>✅ Deterministic (No spikes)</td>
+                      <td style={{ color: '#4C4541' }}>❌ Highly erratic ($O(n!)$ traps)</td>
+                      <td style={{ color: '#4C4541' }}>✅ Instant (&lt; 1 ms)</td>
                     </tr>
                     <tr>
                       <td><strong>Subproblem Memoization</strong></td>
-                      <td style={{ color: '#00f2fe' }}>✅ Optimal ($2^n \times n$ table)</td>
-                      <td style={{ color: '#ef4444' }}>❌ Redundant subtree recalculations</td>
+                      <td style={{ color: '#4C4541' }}>✅ Optimal ($2^n \times n$ table)</td>
+                      <td style={{ color: '#4C4541' }}>❌ Redundant subtree recalculations</td>
                       <td>N/A (No subproblems)</td>
                     </tr>
                     <tr>
                       <td><strong>Optimal Use Case</strong></td>
-                      <td style={{ color: '#00f2fe', fontWeight: 800 }}>🏆 Day-Tours & Drone Sorties ($n \le 17$)</td>
+                      <td style={{ color: '#4C4541', fontWeight: 800 }}>🏆 Day-Tours & Drone Sorties ($n \le 17$)</td>
                       <td>Academic demonstration ($n \le 12$)</td>
                       <td>Mega-fleets ($n &gt; 100$)</td>
                     </tr>

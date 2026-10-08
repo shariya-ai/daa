@@ -14,7 +14,7 @@ import {
   Legend,
   Filler
 } from 'chart.js';
-import { Play, Square, Download, TrendingUp, Cpu, Zap, Activity, Flame } from 'lucide-react';
+import { Play, Square, Download, Activity } from 'lucide-react';
 import { sounds } from '../utils/soundEffects';
 
 ChartJS.register(
@@ -173,29 +173,29 @@ export function BenchmarkSection({ speed = 80 }) {
       {
         label: 'Bitmask DP (Θ(n² 2ⁿ))',
         data: benchmarkData.map((d) => (d.dpAvgMs !== null ? Math.max(0.01, d.dpAvgMs) : null)),
-        borderColor: '#00f2fe',
-        backgroundColor: 'rgba(0, 242, 254, 0.15)',
+        borderColor: '#F2C46A',
+        backgroundColor: 'rgba(242, 196, 106, 0.25)',
         tension: 0.3
       },
       {
         label: 'Branch & Bound (Pruned)',
         data: benchmarkData.map((d) => (d.bbAvgMs !== null ? Math.max(0.01, d.bbAvgMs) : null)),
-        borderColor: '#8b5cf6',
-        backgroundColor: 'rgba(139, 92, 246, 0.15)',
+        borderColor: '#AEAC78',
+        backgroundColor: 'rgba(174, 172, 120, 0.25)',
         tension: 0.3
       },
       {
         label: 'Naive Search (O(n!))',
         data: benchmarkData.map((d) => (d.bbNaiveAvgMs !== null ? Math.max(0.01, d.bbNaiveAvgMs) : null)),
-        borderColor: '#ef4444',
+        borderColor: '#4C4541',
         borderDash: [5, 5],
         tension: 0.3
       },
       {
         label: 'Greedy Ratio (O(n²))',
         data: benchmarkData.map((d) => (d.greedyAvgMs !== null ? Math.max(0.005, d.greedyAvgMs) : null)),
-        borderColor: '#f59e0b',
-        backgroundColor: 'rgba(245, 158, 11, 0.15)',
+        borderColor: '#4C4541',
+        backgroundColor: 'rgba(76, 69, 65, 0.15)',
         tension: 0.3
       }
     ]
@@ -208,10 +208,10 @@ export function BenchmarkSection({ speed = 80 }) {
       {
         label: 'Greedy Suboptimality Gap (%) vs Optimal DP',
         data: benchmarkData.filter((d) => d.greedyGapPct !== null).map((d) => d.greedyGapPct.toFixed(2)),
-        backgroundColor: '#f59e0b',
-        borderColor: '#d97706',
-        borderWidth: 2,
-        borderRadius: 0
+        backgroundColor: '#F2C46A',
+        borderColor: '#4C4541',
+        borderWidth: 1.5,
+        borderRadius: 4
       }
     ]
   };
@@ -223,25 +223,55 @@ export function BenchmarkSection({ speed = 80 }) {
       {
         label: 'Pruned B&B Explored Nodes',
         data: benchmarkData.filter((d) => d.bbAvgNodes !== null).map((d) => d.bbAvgNodes),
-        borderColor: '#8b5cf6',
-        backgroundColor: 'rgba(139, 92, 246, 0.3)',
+        borderColor: '#AEAC78',
+        backgroundColor: 'rgba(174, 172, 120, 0.3)',
         fill: true,
         tension: 0.2
       },
       {
         label: 'Naive Backtracking Nodes (O(n!))',
         data: benchmarkData.filter((d) => d.bbAvgNodes !== null).map((d) => d.bbNaiveAvgNodes),
-        borderColor: '#ef4444',
+        borderColor: '#4C4541',
         borderDash: [4, 4],
         tension: 0.2
       }
     ]
   };
 
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        labels: {
+          color: '#4C4541',
+          font: { family: 'Inter', size: 11, weight: '600' }
+        }
+      },
+      tooltip: {
+        backgroundColor: '#FCF0DA',
+        titleColor: '#4C4541',
+        bodyColor: '#4C4541',
+        borderColor: '#4C4541',
+        borderWidth: 1
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: 'rgba(76, 69, 65, 0.08)' },
+        ticks: { color: '#4C4541', font: { family: 'JetBrains Mono', size: 10 } }
+      },
+      y: {
+        grid: { color: 'rgba(76, 69, 65, 0.08)' },
+        ticks: { color: '#4C4541', font: { family: 'JetBrains Mono', size: 10 } }
+      }
+    }
+  };
+
   return (
     <section id="benchmark" className="benchmark-neo-section">
       <div className="neo-section-header">
-        <div className="neo-tag">EMPIRICAL BENCHMARKS • NEO-BRUTALIST SUITE</div>
+        <div className="neo-tag">EMPIRICAL BENCHMARKS • NEO-LIQUID GLASS SUITE</div>
         <h2 className="neo-title">Algorithmic Performance & Complexity Scaling</h2>
         <p className="neo-subtitle">
           Real-time execution across increasing problem sizes ($n=4$ to $n=100$) demonstrating the mathematical phase transitions of DP, Branch & Bound, and Greedy heuristics.
@@ -298,129 +328,82 @@ export function BenchmarkSection({ speed = 80 }) {
       </div>
 
       {/* Charts Grid */}
-      <div className="neo-charts-grid">
-        
-        {/* Chart 1: Runtime vs n */}
-        <div className="neo-card neo-chart-card span-2">
-          <div className="neo-card-heading">
-            <TrendingUp size={18} color="#00f2fe" />
-            <span>1. Runtime vs Number of Places (n) — Logarithmic Scale (ms)</span>
-          </div>
-          <div className="neo-chart-inner" style={{ height: '340px' }}>
-            <Line
-              data={runtimeChartData}
-              options={{
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                  y: {
-                    type: 'logarithmic',
-                    title: { display: true, text: 'Execution Runtime (ms, log scale)', color: '#94a3b8' },
-                    grid: { color: 'rgba(51, 65, 85, 0.3)' },
-                    ticks: { color: '#cbd5e1' }
-                  },
-                  x: {
-                    title: { display: true, text: 'Number of Places (n)', color: '#94a3b8' },
-                    grid: { color: 'rgba(51, 65, 85, 0.3)' },
-                    ticks: { color: '#cbd5e1' }
-                  }
-                },
-                plugins: { legend: { labels: { color: '#f8fafc', font: { family: 'Space Grotesk', size: 11 } } } }
-              }}
-            />
-          </div>
-        </div>
-
-        {/* Chart 2: Greedy Gap */}
-        <div className="neo-card neo-chart-card">
-          <div className="neo-card-heading">
-            <Zap size={18} color="#f59e0b" />
-            <span>2. Greedy Suboptimality Gap (%) vs Optimal DP</span>
-          </div>
-          <div className="neo-chart-inner" style={{ height: '300px' }}>
-            <Bar
-              data={gapChartData}
-              options={{
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                  y: {
-                    title: { display: true, text: 'Reward Gap %', color: '#94a3b8' },
-                    grid: { color: 'rgba(51, 65, 85, 0.3)' },
-                    ticks: { color: '#cbd5e1' }
-                  },
-                  x: { grid: { color: 'rgba(51, 65, 85, 0.3)' }, ticks: { color: '#cbd5e1' } }
-                },
-                plugins: { legend: { labels: { color: '#f8fafc', font: { family: 'Space Grotesk', size: 11 } } } }
-              }}
-            />
-          </div>
-        </div>
-
-        {/* Chart 3: Pruning Efficiency */}
-        <div className="neo-card neo-chart-card">
-          <div className="neo-card-heading">
-            <Flame size={18} color="#8b5cf6" />
-            <span>3. Branch & Bound Pruning Efficiency (Explored Nodes)</span>
-          </div>
-          <div className="neo-chart-inner" style={{ height: '300px' }}>
-            <Line
-              data={pruningChartData}
-              options={{
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                  y: {
-                    type: 'logarithmic',
-                    title: { display: true, text: 'Nodes Explored (log scale)', color: '#94a3b8' },
-                    grid: { color: 'rgba(51, 65, 85, 0.3)' },
-                    ticks: { color: '#cbd5e1' }
-                  },
-                  x: { grid: { color: 'rgba(51, 65, 85, 0.3)' }, ticks: { color: '#cbd5e1' } }
-                },
-                plugins: { legend: { labels: { color: '#f8fafc', font: { family: 'Space Grotesk', size: 11 } } } }
-              }}
-            />
-          </div>
-        </div>
-
-      </div>
-
-      {/* Neo Brutalist Table */}
       {benchmarkData.length > 0 && (
-        <div className="neo-card" style={{ marginTop: '1.5rem', overflowX: 'auto' }}>
-          <table className="neo-table">
-            <thead>
-              <tr>
-                <th>Instance Size</th>
-                <th>DP Runtime (ms)</th>
-                <th>B&B Pruned (ms)</th>
-                <th>Naive BT (ms)</th>
-                <th>Greedy (ms)</th>
-                <th>B&B Nodes</th>
-                <th>Greedy Gap %</th>
-              </tr>
-            </thead>
-            <tbody>
-              {benchmarkData.map((row) => (
-                <tr key={row.n}>
-                  <td className="neo-cell-bold">n = {row.n}</td>
-                  <td style={{ color: '#00f2fe' }}>{row.dpAvgMs !== null ? `${row.dpAvgMs.toFixed(2)} ms` : '-'}</td>
-                  <td style={{ color: '#8b5cf6' }}>{row.bbAvgMs !== null ? `${row.bbAvgMs.toFixed(2)} ms` : '-'}</td>
-                  <td style={{ color: '#ef4444' }}>{row.bbNaiveAvgMs !== null ? `${row.bbNaiveAvgMs.toFixed(2)} ms` : '-'}</td>
-                  <td style={{ color: '#f59e0b' }}>{row.greedyAvgMs !== null ? `${row.greedyAvgMs.toFixed(3)} ms` : '-'}</td>
-                  <td>{row.bbAvgNodes !== null ? row.bbAvgNodes.toLocaleString() : '-'}</td>
-                  <td>
-                    {row.greedyGapPct !== null ? (
-                      <span className="neo-badge-gap">
-                        -{row.greedyGapPct.toFixed(1)}%
-                      </span>
-                    ) : '-'}
-                  </td>
+        <div className="neo-charts-grid">
+          
+          {/* Chart 1: Log Runtime */}
+          <div className="neo-chart-card">
+            <h3 className="neo-chart-title">1. Logarithmic Runtime Scaling (ms vs n)</h3>
+            <div style={{ height: '260px' }}>
+              <Line
+                data={runtimeChartData}
+                options={{
+                  ...chartOptions,
+                  scales: {
+                    ...chartOptions.scales,
+                    y: { ...chartOptions.scales.y, type: 'logarithmic' }
+                  }
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Chart 2: Greedy Gap */}
+          <div className="neo-chart-card">
+            <h3 className="neo-chart-title">2. Greedy Suboptimality Gap (%) vs Optimal</h3>
+            <div style={{ height: '260px' }}>
+              <Bar data={gapChartData} options={chartOptions} />
+            </div>
+          </div>
+
+          {/* Chart 3: Search Space Pruning */}
+          <div className="neo-chart-card" style={{ gridColumn: '1 / -1' }}>
+            <h3 className="neo-chart-title">3. Search Tree Pruning Efficiency (Nodes Explored: Pruned B&B vs Naive DFS)</h3>
+            <div style={{ height: '260px' }}>
+              <Line data={pruningChartData} options={chartOptions} />
+            </div>
+          </div>
+
+        </div>
+      )}
+
+      {/* Data Table */}
+      {benchmarkData.length > 0 && (
+        <div className="neo-table-card">
+          <div className="comparison-table-scroll">
+            <table className="comparison-table">
+              <thead>
+                <tr>
+                  <th>Instance (n)</th>
+                  <th>Bitmask DP Avg (ms)</th>
+                  <th>Pruned B&B Avg (ms)</th>
+                  <th>Naive Search Avg (ms)</th>
+                  <th>Greedy Ratio Avg (ms)</th>
+                  <th>B&B Nodes Explored</th>
+                  <th>Greedy Gap (%)</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {benchmarkData.map((row) => (
+                  <tr key={row.n}>
+                    <td><strong>n = {row.n}</strong></td>
+                    <td>{row.dpAvgMs !== null ? `${row.dpAvgMs.toFixed(2)} ms` : '—'}</td>
+                    <td>{row.bbAvgMs !== null ? `${row.bbAvgMs.toFixed(2)} ms` : '—'}</td>
+                    <td>{row.bbNaiveAvgMs !== null ? `${row.bbNaiveAvgMs.toFixed(2)} ms` : '—'}</td>
+                    <td>{row.greedyAvgMs !== null ? `${row.greedyAvgMs.toFixed(3)} ms` : '—'}</td>
+                    <td>{row.bbAvgNodes !== null ? row.bbAvgNodes.toLocaleString() : '—'}</td>
+                    <td>
+                      {row.greedyGapPct !== null ? (
+                        <span className="badge badge-warning">-{row.greedyGapPct.toFixed(1)}%</span>
+                      ) : (
+                        '—'
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 

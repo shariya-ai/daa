@@ -1,5 +1,5 @@
 import React from 'react';
-import { Award, AlertTriangle, CheckCircle2, XCircle, ArrowUpRight } from 'lucide-react';
+import { Award, AlertTriangle, CheckCircle2, ArrowUpRight } from 'lucide-react';
 import { sounds } from '../utils/soundEffects';
 
 export function CompareTable({ allSol, currentSolver, budget, onJumpToTheory }) {
@@ -13,7 +13,7 @@ export function CompareTable({ allSol, currentSolver, budget, onJumpToTheory }) 
     <div className="bento-card compare-results-card">
       <div className="bento-card-header">
         <div className="header-title">
-          <Award size={18} color="#00f2fe" />
+          <Award size={18} color="#4C4541" />
           <span>Algorithms Performance & Optimality Benchmark</span>
         </div>
         {onJumpToTheory && (
@@ -33,7 +33,7 @@ export function CompareTable({ allSol, currentSolver, budget, onJumpToTheory }) 
       {/* Greedy Failure Trap Alert */}
       {greedy && greedy.rewardGapPct > 5 && (
         <div className="greedy-warning-banner">
-          <AlertTriangle size={18} color="#f59e0b" style={{ flexShrink: 0 }} />
+          <AlertTriangle size={18} color="#4C4541" style={{ flexShrink: 0 }} />
           <div>
             <strong>⚠️ Greedy Heuristic Suboptimality:</strong> Greedy missed the global maximum reward by{' '}
             <strong>-{greedy.rewardGapPct.toFixed(1)}%</strong> ({greedy.totalReward} vs {allSol.optimalReward} optimal points). Greedy consumed the budget on nearby low-value stops!
@@ -62,7 +62,7 @@ export function CompareTable({ allSol, currentSolver, budget, onJumpToTheory }) 
                 <td>
                   <span className="algo-badge badge-dp">Bitmask DP</span>
                 </td>
-                <td className="highlight-val reward-cyan">
+                <td className="highlight-val">
                   +{dp.totalReward} Points
                 </td>
                 <td>{dp.timeUsed.toFixed(1)}m / {budget}m</td>
@@ -78,7 +78,7 @@ export function CompareTable({ allSol, currentSolver, budget, onJumpToTheory }) 
             ) : allSol.dpError ? (
               <tr>
                 <td><span className="algo-badge badge-dp">Bitmask DP</span></td>
-                <td colSpan={6} style={{ color: '#f59e0b' }}>{allSol.dpError}</td>
+                <td colSpan={6} style={{ color: '#4C4541' }}>{allSol.dpError}</td>
               </tr>
             ) : null}
 
@@ -88,7 +88,7 @@ export function CompareTable({ allSol, currentSolver, budget, onJumpToTheory }) 
                 <td>
                   <span className="algo-badge badge-bb">{bb.name}</span>
                 </td>
-                <td className="highlight-val reward-violet">
+                <td className="highlight-val">
                   +{bb.totalReward} Points
                 </td>
                 <td>{bb.timeUsed.toFixed(1)}m / {budget}m</td>
@@ -106,7 +106,7 @@ export function CompareTable({ allSol, currentSolver, budget, onJumpToTheory }) 
             ) : allSol.bbError ? (
               <tr>
                 <td><span className="algo-badge badge-bb">Branch & Bound</span></td>
-                <td colSpan={6} style={{ color: '#f59e0b' }}>{allSol.bbError}</td>
+                <td colSpan={6} style={{ color: '#4C4541' }}>{allSol.bbError}</td>
               </tr>
             ) : null}
 
@@ -116,7 +116,7 @@ export function CompareTable({ allSol, currentSolver, budget, onJumpToTheory }) 
                 <td>
                   <span className="algo-badge badge-greedy">Greedy Ratio</span>
                 </td>
-                <td className="highlight-val reward-amber">
+                <td className="highlight-val">
                   +{greedy.totalReward} Points
                 </td>
                 <td>{greedy.timeUsed.toFixed(1)}m / {budget}m</td>

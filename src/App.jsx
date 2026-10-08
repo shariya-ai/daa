@@ -287,7 +287,7 @@ export function App() {
       {/* Toast Notification */}
       {toastMessage && (
         <div className="spatial-toast-pill">
-          <Sparkles size={15} color="#00f2fe" />
+          <Sparkles size={15} color="#4C4541" />
           <span>{toastMessage}</span>
         </div>
       )}

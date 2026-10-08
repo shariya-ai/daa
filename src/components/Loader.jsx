@@ -74,7 +74,7 @@ export function Loader({ onFinished }) {
                 />
               </svg>
               <div className="loader-icon-box">
-                <Compass size={38} className="loader-compass-spin" />
+                <Compass size={38} className="loader-compass-spin" color="#4C4541" />
               </div>
             </div>
 
@@ -86,7 +86,7 @@ export function Loader({ onFinished }) {
             >
               BudgetTrail
               <span className="badge badge-aurora">
-                <Sparkles size={11} /> Orienteering Solver
+                <Sparkles size={11} color="#4C4541" /> Orienteering Solver
               </span>
             </motion.div>
 

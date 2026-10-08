@@ -20,13 +20,11 @@ export function DPStepThroughModal({ isOpen, onClose, depot, places, speed, budg
       return;
     }
 
-    // Solve with step recording enabled
     const res = OrienteeringSolvers.solveDP(depot, places, speed, budget, returnToStart, true);
     setHistory(res.stepHistory || []);
     setStepIdx(0);
   }, [isOpen, depot, places, speed, budget, returnToStart, isTooLarge, n]);
 
-  // Auto-play timer
   useEffect(() => {
     if (isPlaying) {
       timerRef.current = setInterval(() => {
@@ -81,7 +79,6 @@ export function DPStepThroughModal({ isOpen, onClose, depot, places, speed, budg
   const curStep = history[stepIdx] || {};
   const numStates = 1 << n;
 
-  // Build cell values up to current step
   const cellValues = {};
   for (let s = 0; s <= stepIdx; s++) {
     const item = history[s];
@@ -106,7 +103,7 @@ export function DPStepThroughModal({ isOpen, onClose, depot, places, speed, budg
         <div className="modal-top-bar">
           <div className="modal-title-box">
             <div className="modal-icon-glow">
-              <Cpu size={20} color="#00f2fe" />
+              <Cpu size={20} color="#4C4541" />
             </div>
             <div>
               <h3 className="modal-title">Bitmask DP Step-Through Matrix Visualizer</h3>
@@ -120,7 +117,7 @@ export function DPStepThroughModal({ isOpen, onClose, depot, places, speed, budg
 
         {isTooLarge ? (
           <div className="modal-body-warning">
-            <AlertCircle size={44} color="#f59e0b" />
+            <AlertCircle size={44} color="#4C4541" />
             <h4>{"Step-Through Visualizer is configured for n ≤ 5"}</h4>
             <p>
               Your active map has <strong>n = {n}</strong> places (2<sup>{n}</sup> = {1 << n} matrix rows). 

@@ -31,7 +31,7 @@ export function Preset3DDome({ currentPresetId, onLoadPreset }) {
     <div className="dome-gallery-wrapper">
       <div className="dome-gallery-topbar">
         <div className="dome-title">
-          <Sparkles size={16} color="#00f2fe" />
+          <Sparkles size={16} color="#4C4541" />
           <span>Preset Scenario Gallery — 5 Academic Test Benches</span>
         </div>
         <div className="dome-nav-arrows">
@@ -57,7 +57,7 @@ export function Preset3DDome({ currentPresetId, onLoadPreset }) {
             >
               <span className="pill-dot" style={{ background: p.color }} />
               <span className="pill-title">{p.name.split('(')[0]}</span>
-              {isActive && <CheckCircle2 size={12} color="#00f2fe" />}
+              {isActive && <CheckCircle2 size={12} color="#4C4541" />}
             </button>
           );
         })}
@@ -71,9 +71,9 @@ export function Preset3DDome({ currentPresetId, onLoadPreset }) {
               <span
                 className="dome-card-tag"
                 style={{
-                  color: curPreset.color,
-                  borderColor: `${curPreset.color}60`,
-                  background: `${curPreset.color}18`
+                  color: '#4C4541',
+                  borderColor: 'rgba(76, 69, 65, 0.25)',
+                  background: 'rgba(252, 240, 218, 0.9)'
                 }}
               >
                 {curPreset.tag}
@@ -83,15 +83,15 @@ export function Preset3DDome({ currentPresetId, onLoadPreset }) {
             
             <div className="spotlight-meta-pills">
               <div className="meta-pill">
-                <MapPin size={13} color="#00f2fe" />
+                <MapPin size={13} color="#4C4541" />
                 <span><strong>{curPreset.places.length}</strong> Destinations</span>
               </div>
               <div className="meta-pill">
-                <Clock size={13} color="#f59e0b" />
+                <Clock size={13} color="#4C4541" />
                 <span>Budget: <strong>{curPreset.budget} min</strong></span>
               </div>
               <div className="meta-pill">
-                <Compass size={13} color="#a855f7" />
+                <Compass size={13} color="#4C4541" />
                 <span>Return to Depot: <strong>{curPreset.returnToStart ? 'Yes (Loop)' : 'No (Open)'}</strong></span>
               </div>
             </div>
@@ -123,4 +123,3 @@ export function Preset3DDome({ currentPresetId, onLoadPreset }) {
     </div>
   );
 }
-

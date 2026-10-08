@@ -111,7 +111,7 @@ export function ControlsPanel({
       <div className="bento-card">
         <div className="bento-card-header">
           <div className="header-title">
-            <Sliders size={16} color="#00f2fe" />
+            <Sliders size={16} color="#4C4541" />
             <span>Algorithm Engine</span>
           </div>
           <span className="header-tag">Solver</span>
@@ -143,7 +143,7 @@ export function ControlsPanel({
         <div className="toggles-list">
           <label className="custom-toggle-row">
             <div className="toggle-label">
-              <Layers size={14} color="#8b5cf6" />
+              <Layers size={14} color="#AEAC78" />
               <span>B&B Pruning Active</span>
             </div>
             <input
@@ -159,7 +159,7 @@ export function ControlsPanel({
 
           <label className="custom-toggle-row">
             <div className="toggle-label">
-              <RotateCcw size={14} color="#00f2fe" />
+              <RotateCcw size={14} color="#F2C46A" />
               <span>Return to Depot ($v_0$)</span>
             </div>
             <input
@@ -175,7 +175,7 @@ export function ControlsPanel({
 
           <label className="custom-toggle-row">
             <div className="toggle-label">
-              <Eye size={14} color="#f59e0b" />
+              <Eye size={14} color="#4C4541" />
               <span>Overlay Compare Mode</span>
             </div>
             <input
@@ -194,24 +194,24 @@ export function ControlsPanel({
         <div className="special-buttons-row">
           <button
             className="btn btn-outline btn-sm"
-            style={{ flex: 1, borderColor: 'rgba(0, 242, 254, 0.4)', color: '#00f2fe' }}
+            style={{ flex: 1 }}
             onClick={() => {
               sounds.playClick();
               onOpenStepThrough();
             }}
           >
-            <Cpu size={14} /> DP Bitmask Stepper
+            <Cpu size={14} color="#4C4541" /> DP Stepper
           </button>
 
           <button
             className="btn btn-outline btn-sm"
-            style={{ flex: 1, borderColor: 'rgba(16, 185, 129, 0.4)', color: '#10b981' }}
+            style={{ flex: 1 }}
             onClick={() => {
               sounds.playClick();
               onOpenSelfCheck();
             }}
           >
-            <CheckCircle size={14} /> Self-Check
+            <CheckCircle size={14} color="#AEAC78" /> Self-Check
           </button>
         </div>
       </div>
@@ -220,7 +220,7 @@ export function ControlsPanel({
       <div className="bento-card">
         <div className="bento-card-header">
           <div className="header-title">
-            <Clock size={16} color="#00f2fe" />
+            <Clock size={16} color="#4C4541" />
             <span>Time Budget & Speed</span>
           </div>
           <span className="header-tag highlight">{budget} min</span>
@@ -230,14 +230,14 @@ export function ControlsPanel({
         <div className="slider-group">
           <div className="slider-label-row">
             <span>Total Time Budget ($B$):</span>
-            <strong className="slider-val-tag cyan">{budget} min</strong>
+            <strong className="slider-val-tag">{budget} min</strong>
           </div>
           <input
             type="range"
             min="30"
             max="400"
             step="5"
-            className="spatial-range cyan"
+            className="spatial-range"
             value={budget}
             onChange={(e) => setBudget(Number(e.target.value))}
           />
@@ -247,14 +247,14 @@ export function ControlsPanel({
         <div className="slider-group" style={{ marginTop: '0.6rem' }}>
           <div className="slider-label-row">
             <span><Gauge size={13} style={{ display: 'inline' }} /> Vehicle Speed:</span>
-            <strong className="slider-val-tag violet">{speed} px/min</strong>
+            <strong className="slider-val-tag">{speed} px/min</strong>
           </div>
           <input
             type="range"
             min="30"
             max="200"
             step="5"
-            className="spatial-range violet"
+            className="spatial-range"
             value={speed}
             onChange={(e) => setSpeed(Number(e.target.value))}
           />
@@ -384,7 +384,7 @@ export function ControlsPanel({
                   <div className="mini-slider-unit">
                     <div className="mini-slider-label">
                       <span>Reward:</span>
-                      <strong style={{ color: '#00f2fe' }}>+{place.reward}</strong>
+                      <strong style={{ color: '#4C4541' }}>+{place.reward}</strong>
                     </div>
                     <input
                       type="range"
@@ -393,14 +393,14 @@ export function ControlsPanel({
                       value={place.reward}
                       onChange={(e) => handleRewardSliderChange(idx, e.target.value)}
                       onClick={(e) => e.stopPropagation()}
-                      className="spatial-range-mini cyan"
+                      className="spatial-range-mini"
                     />
                   </div>
 
                   <div className="mini-slider-unit">
                     <div className="mini-slider-label">
                       <span>Stay Time:</span>
-                      <strong style={{ color: '#8b5cf6' }}>{place.stayTime}m</strong>
+                      <strong style={{ color: '#4C4541' }}>{place.stayTime}m</strong>
                     </div>
                     <input
                       type="range"
@@ -409,7 +409,7 @@ export function ControlsPanel({
                       value={place.stayTime}
                       onChange={(e) => handleStaySliderChange(idx, e.target.value)}
                       onClick={(e) => e.stopPropagation()}
-                      className="spatial-range-mini violet"
+                      className="spatial-range-mini"
                     />
                   </div>
                 </div>

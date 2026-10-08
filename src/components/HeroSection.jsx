@@ -45,10 +45,10 @@ export function HeroSection({ onLaunchPlayground }) {
           className="parallax-layer layer-floating-pins" 
           ref={(el) => (layersRef.current[3] = el)}
         >
-          <div className="floating-pin pin-1"><MapPin size={18} color="#00f2fe" /> <span>Summit R=10</span></div>
-          <div className="floating-pin pin-2"><MapPin size={16} color="#10b981" /> <span>Citadel R=9</span></div>
-          <div className="floating-pin pin-3"><MapPin size={14} color="#f59e0b" /> <span>Depot v₀</span></div>
-          <div className="floating-pin pin-4"><MapPin size={15} color="#8b5cf6" /> <span>Tower R=8</span></div>
+          <div className="floating-pin pin-1"><MapPin size={16} color="#F2C46A" /> <span>Summit R=10</span></div>
+          <div className="floating-pin pin-2"><MapPin size={16} color="#AEAC78" /> <span>Citadel R=9</span></div>
+          <div className="floating-pin pin-3"><MapPin size={16} color="#4C4541" /> <span>Depot v₀</span></div>
+          <div className="floating-pin pin-4"><MapPin size={16} color="#AEAC78" /> <span>Tower R=8</span></div>
         </div>
       </div>
 
@@ -62,7 +62,7 @@ export function HeroSection({ onLaunchPlayground }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          <Sparkles size={14} color="#00f2fe" />
+          <Sparkles size={14} color="#4C4541" />
           <span>DAA Project • Selective TSP & Orienteering Problem</span>
         </motion.div>
 
@@ -95,7 +95,7 @@ export function HeroSection({ onLaunchPlayground }) {
           transition={{ duration: 0.7, delay: 0.5 }}
         >
           <div className="hero-metric-card">
-            <div className="metric-icon cyan"><Cpu size={18} /></div>
+            <div className="metric-icon"><Cpu size={18} /></div>
             <div className="metric-data">
               <span className="metric-num">{"Θ(n² · 2ⁿ)"}</span>
               <span className="metric-lbl">Bitmask DP Complexity</span>
@@ -103,7 +103,7 @@ export function HeroSection({ onLaunchPlayground }) {
           </div>
 
           <div className="hero-metric-card">
-            <div className="metric-icon emerald"><ShieldCheck size={18} /></div>
+            <div className="metric-icon"><ShieldCheck size={18} /></div>
             <div className="metric-data">
               <span className="metric-num">100% Exact</span>
               <span className="metric-lbl">Global Optimality</span>
@@ -111,7 +111,7 @@ export function HeroSection({ onLaunchPlayground }) {
           </div>
 
           <div className="hero-metric-card">
-            <div className="metric-icon amber"><Zap size={18} /></div>
+            <div className="metric-icon"><Zap size={18} /></div>
             <div className="metric-data">
               <span className="metric-num">O(n²) Heuristic</span>
               <span className="metric-lbl">Greedy Ratio Benchmark</span>
@@ -119,7 +119,7 @@ export function HeroSection({ onLaunchPlayground }) {
           </div>
 
           <div className="hero-metric-card">
-            <div className="metric-icon violet"><Gauge size={18} /></div>
+            <div className="metric-icon"><Gauge size={18} /></div>
             <div className="metric-data">
               <span className="metric-num">50-Test</span>
               <span className="metric-lbl">In-App Automated Suite</span>

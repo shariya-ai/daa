@@ -34,7 +34,6 @@ export function Navbar({ audioEnabled, setAudioEnabled, onOpenSelfCheck }) {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 40);
 
-      // Section scrollspy
       const sections = ['hero', 'story', 'playground', 'benchmark', 'theory', 'applications'];
       const scrollPos = window.scrollY + 200;
 
@@ -113,7 +112,7 @@ export function Navbar({ audioEnabled, setAudioEnabled, onOpenSelfCheck }) {
               }}
               title="Run 50-Instance Verification Suite (DP vs B&B)"
             >
-              <CheckCircle size={14} color="#10b981" />
+              <CheckCircle size={14} color="#4C4541" />
               <span>Self-Check (50)</span>
             </button>
 
@@ -121,10 +120,10 @@ export function Navbar({ audioEnabled, setAudioEnabled, onOpenSelfCheck }) {
             <button
               className="nav-icon-btn"
               onClick={handleAudioToggle}
-              title={audioEnabled ? 'Mute Web Audio Synth' : 'Enable Web Audio Synth'}
+              title={audioEnabled ? 'Mute Audio Synth' : 'Enable Audio Synth'}
               aria-label="Toggle Audio"
             >
-              {audioEnabled ? <Volume2 size={16} color="#10b981" /> : <VolumeX size={16} color="#64748b" />}
+              {audioEnabled ? <Volume2 size={16} color="#4C4541" /> : <VolumeX size={16} color="rgba(76,69,65,0.5)" />}
             </button>
 
             {/* GitHub */}
@@ -159,7 +158,7 @@ export function Navbar({ audioEnabled, setAudioEnabled, onOpenSelfCheck }) {
           <div className="mobile-drawer-content">
             <div className="mobile-drawer-header">
               <div className="nav-brand">
-                <Compass size={22} color="#00f2fe" />
+                <Compass size={22} color="#F2C46A" />
                 <span className="brand-name">BudgetTrail</span>
               </div>
               <button className="nav-icon-btn" onClick={() => setMobileMenuOpen(false)}>
@@ -185,13 +184,13 @@ export function Navbar({ audioEnabled, setAudioEnabled, onOpenSelfCheck }) {
 
               <button
                 className="mobile-nav-item"
-                style={{ color: '#10b981', borderTop: '1px solid var(--glass-border)', marginTop: '0.5rem' }}
+                style={{ color: '#4C4541', borderTop: '1px solid rgba(76,69,65,0.15)', marginTop: '0.5rem' }}
                 onClick={() => {
                   setMobileMenuOpen(false);
                   onOpenSelfCheck();
                 }}
               >
-                <CheckCircle size={18} />
+                <CheckCircle size={18} color="#AEAC78" />
                 <span>Run 50-Test Self-Check</span>
               </button>
             </div>

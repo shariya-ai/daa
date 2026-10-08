@@ -19,7 +19,7 @@ export function StorySection({ onJumpToPlayground }) {
       step: '01',
       title: 'The Real-World Dilemma: Why TSP Breaks Down',
       badge: 'The Dilemma',
-      color: '#ef4444',
+      color: '#4C4541',
       icon: AlertTriangle,
       content: (
         <div className="story-card-body">
@@ -43,7 +43,7 @@ export function StorySection({ onJumpToPlayground }) {
       step: '02',
       title: 'The Orienteering Formulation: Selective Prize Collection',
       badge: 'Inputs & Parameters',
-      color: '#00f2fe',
+      color: '#F2C46A',
       icon: MapPin,
       content: (
         <div className="story-card-body">
@@ -75,7 +75,7 @@ export function StorySection({ onJumpToPlayground }) {
       step: '03',
       title: 'The Mathematical Objective: Maximize Reward Under Budget',
       badge: 'Mathematical Model',
-      color: '#10b981',
+      color: '#AEAC78',
       icon: Target,
       content: (
         <div className="story-card-body">
@@ -102,21 +102,21 @@ export function StorySection({ onJumpToPlayground }) {
       step: '04',
       title: 'The Three Algorithmic Frontiers',
       badge: 'Solvers Architecture',
-      color: '#8b5cf6',
+      color: '#F2C46A',
       icon: Cpu,
       content: (
         <div className="story-card-body">
           <div className="story-solvers-comparison">
             <div className="solver-preview-box winner">
-              <div className="solver-badge"><CheckCircle2 size={13} color="#10b981" /> {"Bitmask DP (Θ(n² · 2ⁿ))"}</div>
+              <div className="solver-badge"><CheckCircle2 size={13} color="#F2C46A" /> {"Bitmask DP (Θ(n² · 2ⁿ))"}</div>
               <p>{"Memoizes shortest times for all 2ⁿ × n subproblems. Guaranteed global optimal reward."}</p>
             </div>
             <div className="solver-preview-box">
-              <div className="solver-badge"><CheckCircle2 size={13} color="#06b6d4" /> {"Branch & Bound (O(n!))"}</div>
+              <div className="solver-badge"><CheckCircle2 size={13} color="#AEAC78" /> {"Branch & Bound (O(n!))"}</div>
               <p>{"Recursive DFS with upper bound and time budget pruning. Exact, but factorially slow for large n."}</p>
             </div>
             <div className="solver-preview-box">
-              <div className="solver-badge"><XCircle size={13} color="#f59e0b" /> {"Greedy Heuristic (O(n²))"}</div>
+              <div className="solver-badge"><XCircle size={13} color="#4C4541" /> {"Greedy Heuristic (O(n²))"}</div>
               <p>{"Greedily grabs max (Reward / Travel Time) next stop. Fast, but vulnerable to local traps."}</p>
             </div>
           </div>
@@ -164,12 +164,11 @@ export function StorySection({ onJumpToPlayground }) {
               viewport={{ once: true, margin: '-80px' }}
               transition={{ duration: 0.6, delay: idx * 0.1 }}
               style={{
-                top: `calc(100px + ${idx * 28}px)`,
-                borderColor: `${card.color}40`
+                top: `calc(100px + ${idx * 28}px)`
               }}
             >
               <div className="story-card-topbar">
-                <div className="story-card-badge" style={{ color: card.color, background: `${card.color}15`, borderColor: `${card.color}35` }}>
+                <div className="story-card-badge">
                   <Icon size={14} />
                   <span>{card.badge}</span>
                 </div>

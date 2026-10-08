@@ -27,10 +27,10 @@ export function MapCanvas({
   const animPhaseRef = useRef(0);
 
   const getRewardColor = (reward) => {
-    if (reward >= 9) return { bg: '#00f2fe', glow: 'rgba(0, 242, 254, 0.7)', border: '#67e8f9', text: '#080d17' };
-    if (reward >= 7) return { bg: '#10b981', glow: 'rgba(16, 185, 129, 0.6)', border: '#6ee7b7', text: '#080d17' };
-    if (reward >= 4) return { bg: '#f59e0b', glow: 'rgba(245, 158, 11, 0.5)', border: '#fde047', text: '#080d17' };
-    return { bg: '#8b5cf6', glow: 'rgba(139, 92, 246, 0.5)', border: '#c4b5fd', text: '#080d17' };
+    if (reward >= 9) return { bg: '#F2C46A', glow: 'rgba(242, 196, 106, 0.75)', border: '#4C4541', text: '#4C4541' };
+    if (reward >= 7) return { bg: '#AEAC78', glow: 'rgba(174, 172, 120, 0.65)', border: '#4C4541', text: '#FCF0DA' };
+    if (reward >= 4) return { bg: '#FCF0DA', glow: 'rgba(174, 172, 120, 0.4)', border: '#AEAC78', text: '#4C4541' };
+    return { bg: '#FCF0DA', glow: 'rgba(76, 69, 65, 0.2)', border: '#4C4541', text: '#4C4541' };
   };
 
   const getRewardRadius = (reward) => 13 + ((reward - 1) / 9) * 9;
@@ -149,14 +149,11 @@ export function MapCanvas({
     const hit = findNodeAt(x, y);
 
     if (hit && hit.type === 'place') {
-      const updated = places.filter((_, idx) => idx !== hit.index).map((p, idx) => ({
-        ...p,
-        id: idx + 1
-      }));
+      sounds.playClick();
+      const updated = places.filter((_, idx) => idx !== hit.index).map((p, idx) => ({ ...p, id: idx + 1 }));
       setPlaces(updated);
       setSelectedNodeIndex(-1);
       setHoveredPlace(null);
-      sounds.playClick();
       if (onStateModified) onStateModified(updated, depot);
     }
   };
@@ -166,14 +163,16 @@ export function MapCanvas({
     const hit = findNodeAt(x, y);
     if (hit && hit.type === 'place') {
       const updated = [...places];
-      const cur = updated[hit.index];
-      cur.reward = (cur.reward % 10) + 1;
+      const curR = updated[hit.index].reward;
+      const nextR = curR >= 10 ? 1 : curR + 1;
+      updated[hit.index] = { ...updated[hit.index], reward: nextR };
       setPlaces(updated);
-      sounds.playRewardTick(cur.reward);
+      sounds.playRewardTick(nextR);
       if (onStateModified) onStateModified(updated, depot);
     }
   };
 
+  // Canvas Render Loop
   useEffect(() => {
     let animationFrameId;
     const canvas = canvasRef.current;
@@ -195,13 +194,13 @@ export function MapCanvas({
       const w = rect.width;
       const h = rect.height;
 
-      // 1. Dark Topographic Map Background
-      ctx.fillStyle = '#060913';
+      // 1. Light Liquid Pearl Background
+      ctx.fillStyle = '#FCF0DA';
       ctx.fillRect(0, 0, w, h);
 
-      // Topographic grid lines
+      // Topographic subtle grid lines
       ctx.save();
-      ctx.strokeStyle = 'rgba(15, 23, 42, 0.6)';
+      ctx.strokeStyle = 'rgba(76, 69, 65, 0.08)';
       ctx.lineWidth = 1;
       const gridSize = 45;
       ctx.beginPath();
@@ -216,10 +215,10 @@ export function MapCanvas({
       ctx.stroke();
 
       // Atmospheric radial gradient from depot
-      const bgGrad = ctx.createRadialGradient(depot.x, depot.y, 30, depot.x, depot.y, Math.max(w, h));
-      bgGrad.addColorStop(0, 'rgba(0, 242, 254, 0.08)');
-      bgGrad.addColorStop(0.5, 'rgba(139, 92, 246, 0.04)');
-      bgGrad.addColorStop(1, 'rgba(6, 9, 19, 0)');
+      const bgGrad = ctx.createRadialGradient(depot.x, depot.y, 25, depot.x, depot.y, Math.max(w, h));
+      bgGrad.addColorStop(0, 'rgba(242, 196, 106, 0.22)');
+      bgGrad.addColorStop(0.45, 'rgba(174, 172, 120, 0.12)');
+      bgGrad.addColorStop(1, 'rgba(252, 240, 218, 0)');
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, w, h);
       ctx.restore();
@@ -231,7 +230,7 @@ export function MapCanvas({
       // 2. Spatial Mesh Links between close destinations
       if (places.length > 1) {
         ctx.save();
-        ctx.strokeStyle = 'rgba(51, 65, 85, 0.18)';
+        ctx.strokeStyle = 'rgba(76, 69, 65, 0.12)';
         ctx.lineWidth = 1;
         ctx.setLineDash([4, 6]);
         ctx.beginPath();
@@ -250,9 +249,9 @@ export function MapCanvas({
 
       // 3. Draw Route Lines
       const routeStyles = {
-        dp: { color: '#00f2fe', glow: 'rgba(0, 242, 254, 0.65)', width: 3.5, dash: [], offset: 0 },
-        backtracking: { color: '#8b5cf6', glow: 'rgba(139, 92, 246, 0.6)', width: 2.8, dash: [6, 4], offset: -3 },
-        greedy: { color: '#f59e0b', glow: 'rgba(245, 158, 11, 0.6)', width: 2.5, dash: [3, 4], offset: 3 }
+        dp: { color: '#F2C46A', glow: 'rgba(242, 196, 106, 0.8)', strokeEdge: '#4C4541', width: 4, dash: [], offset: 0 },
+        backtracking: { color: '#AEAC78', glow: 'rgba(174, 172, 120, 0.75)', strokeEdge: '#4C4541', width: 3.2, dash: [6, 4], offset: -3 },
+        greedy: { color: '#4C4541', glow: 'rgba(76, 69, 65, 0.35)', strokeEdge: '#4C4541', width: 2.6, dash: [3, 4], offset: 3 }
       };
 
       const routesToRender = [];
@@ -277,7 +276,7 @@ export function MapCanvas({
         ctx.lineWidth = cfg.width;
         ctx.setLineDash(cfg.dash);
         ctx.shadowColor = cfg.glow;
-        ctx.shadowBlur = 14;
+        ctx.shadowBlur = 12;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
 
@@ -321,6 +320,9 @@ export function MapCanvas({
           ctx.lineTo(-7, 4);
           ctx.closePath();
           ctx.fill();
+          ctx.strokeStyle = '#4C4541';
+          ctx.lineWidth = 1;
+          ctx.stroke();
           ctx.restore();
         }
         ctx.restore();
@@ -343,16 +345,16 @@ export function MapCanvas({
         if (place.reward >= 9) {
           const pulse = (Math.sin(animPhaseRef.current * 3) + 1) / 2;
           ctx.beginPath();
-          ctx.arc(place.x, place.y, r + 5 + pulse * 7, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(0, 242, 254, ${0.15 + pulse * 0.2})`;
+          ctx.arc(place.x, place.y, r + 5 + pulse * 6, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(242, 196, 106, ${0.25 + pulse * 0.25})`;
           ctx.fill();
         }
 
         // Selection ring
         if (isSelected) {
           ctx.beginPath();
-          ctx.arc(place.x, place.y, r + 7, 0, Math.PI * 2);
-          ctx.strokeStyle = '#00f2fe';
+          ctx.arc(place.x, place.y, r + 6, 0, Math.PI * 2);
+          ctx.strokeStyle = '#4C4541';
           ctx.lineWidth = 2.5;
           ctx.setLineDash([4, 3]);
           ctx.stroke();
@@ -363,11 +365,11 @@ export function MapCanvas({
         ctx.arc(place.x, place.y, r, 0, Math.PI * 2);
         ctx.fillStyle = col.bg;
         ctx.shadowColor = col.glow;
-        ctx.shadowBlur = 16;
+        ctx.shadowBlur = 12;
         ctx.fill();
 
-        ctx.strokeStyle = isSelected ? '#ffffff' : col.border;
-        ctx.lineWidth = isSelected ? 3 : 2;
+        ctx.strokeStyle = col.border;
+        ctx.lineWidth = isSelected ? 2.5 : 1.8;
         ctx.stroke();
 
         // Pin Text: Reward
@@ -379,12 +381,12 @@ export function MapCanvas({
         ctx.fillText(`+${place.reward}`, place.x, place.y);
 
         // Place Name & Stay Time below
-        ctx.font = '500 11px Inter, sans-serif';
-        ctx.fillStyle = isVisited ? '#ffffff' : '#94a3b8';
+        ctx.font = '600 11px Inter, sans-serif';
+        ctx.fillStyle = isVisited ? '#4C4541' : 'rgba(76, 69, 65, 0.65)';
         ctx.fillText(place.name, place.x, place.y + r + 13);
 
-        ctx.font = '400 9.5px JetBrains Mono, sans-serif';
-        ctx.fillStyle = 'rgba(148, 163, 184, 0.75)';
+        ctx.font = '500 9.5px JetBrains Mono, sans-serif';
+        ctx.fillStyle = 'rgba(76, 69, 65, 0.7)';
         ctx.fillText(`⏱️ ${place.stayTime}m`, place.x, place.y + r + 24);
 
         // Visit Sequence Badge
@@ -393,14 +395,14 @@ export function MapCanvas({
           if (stepIndex !== -1) {
             ctx.beginPath();
             ctx.arc(place.x - r * 0.7, place.y - r * 0.7, 9, 0, Math.PI * 2);
-            ctx.fillStyle = '#060913';
+            ctx.fillStyle = '#FCF0DA';
             ctx.fill();
-            ctx.strokeStyle = '#00f2fe';
+            ctx.strokeStyle = '#4C4541';
             ctx.lineWidth = 1.8;
             ctx.stroke();
 
-            ctx.fillStyle = '#00f2fe';
-            ctx.font = 'bold 9px JetBrains Mono, sans-serif';
+            ctx.fillStyle = '#4C4541';
+            ctx.font = 'bold 9.5px JetBrains Mono, sans-serif';
             ctx.fillText(`${stepIndex + 1}`, place.x - r * 0.7, place.y - r * 0.7);
           }
         }
@@ -409,10 +411,10 @@ export function MapCanvas({
 
       // 5. Depot Basecamp Marker
       ctx.save();
-      const radarR = 24 + Math.sin(animPhaseRef.current) * 6;
+      const radarR = 24 + Math.sin(animPhaseRef.current) * 5;
       ctx.beginPath();
       ctx.arc(depot.x, depot.y, radarR, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(0, 242, 254, 0.35)';
+      ctx.strokeStyle = 'rgba(242, 196, 106, 0.45)';
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
@@ -424,23 +426,23 @@ export function MapCanvas({
       ctx.lineTo(depot.x, depot.y + dSize);
       ctx.lineTo(depot.x - dSize, depot.y);
       ctx.closePath();
-      ctx.fillStyle = '#00f2fe';
-      ctx.shadowColor = 'rgba(0, 242, 254, 0.85)';
-      ctx.shadowBlur = 18;
+      ctx.fillStyle = '#F2C46A';
+      ctx.shadowColor = 'rgba(242, 196, 106, 0.8)';
+      ctx.shadowBlur = 14;
       ctx.fill();
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 2.2;
+      ctx.strokeStyle = '#4C4541';
+      ctx.lineWidth = 2;
       ctx.stroke();
 
       ctx.shadowBlur = 0;
-      ctx.fillStyle = '#060913';
+      ctx.fillStyle = '#4C4541';
       ctx.font = 'bold 10px Space Grotesk, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('v₀', depot.x, depot.y);
 
-      ctx.font = '600 11.5px Inter, sans-serif';
-      ctx.fillStyle = '#00f2fe';
+      ctx.font = '700 11.5px Inter, sans-serif';
+      ctx.fillStyle = '#4C4541';
       ctx.fillText(depot.name || 'Start Depot v₀', depot.x, depot.y + dSize + 15);
       ctx.restore();
 
@@ -476,16 +478,16 @@ export function MapCanvas({
           ctx.rotate(angle);
 
           // Forward Trail Scanner Beam
-          const grad = ctx.createRadialGradient(8, 0, 2, 50, 0, 38);
-          grad.addColorStop(0, 'rgba(0, 242, 254, 0.7)');
-          grad.addColorStop(0.6, 'rgba(0, 242, 254, 0.2)');
-          grad.addColorStop(1, 'rgba(0, 242, 254, 0)');
+          const grad = ctx.createRadialGradient(8, 0, 2, 45, 0, 32);
+          grad.addColorStop(0, 'rgba(242, 196, 106, 0.6)');
+          grad.addColorStop(0.6, 'rgba(242, 196, 106, 0.15)');
+          grad.addColorStop(1, 'rgba(242, 196, 106, 0)');
           ctx.fillStyle = grad;
           ctx.beginPath();
-          ctx.moveTo(8, -6);
-          ctx.lineTo(50, -25);
-          ctx.lineTo(50, 25);
-          ctx.lineTo(8, 6);
+          ctx.moveTo(8, -5);
+          ctx.lineTo(45, -20);
+          ctx.lineTo(45, 20);
+          ctx.lineTo(8, 5);
           ctx.closePath();
           ctx.fill();
 
@@ -493,30 +495,28 @@ export function MapCanvas({
           const scoutPulse = Math.sin(animPhaseRef.current * 3) * 2;
           ctx.beginPath();
           ctx.arc(0, 0, 14 + scoutPulse, 0, Math.PI * 2);
-          ctx.strokeStyle = 'rgba(0, 242, 254, 0.4)';
+          ctx.strokeStyle = 'rgba(174, 172, 120, 0.5)';
           ctx.lineWidth = 1.5;
           ctx.stroke();
 
           // Scout Drone Cross Wings
-          ctx.strokeStyle = '#00f2fe';
+          ctx.strokeStyle = '#4C4541';
           ctx.lineWidth = 2;
           ctx.beginPath();
-          // Thruster wing diagonal 1
-          ctx.moveTo(-10, -10);
-          ctx.lineTo(10, 10);
-          // Thruster wing diagonal 2
-          ctx.moveTo(-10, 10);
-          ctx.lineTo(10, -10);
+          ctx.moveTo(-9, -9);
+          ctx.lineTo(9, 9);
+          ctx.moveTo(-9, 9);
+          ctx.lineTo(9, -9);
           ctx.stroke();
 
           // Thruster Pods (4 dots)
           const pods = [
-            { x: -10, y: -10 },
-            { x: 10, y: -10 },
-            { x: 10, y: 10 },
-            { x: -10, y: 10 }
+            { x: -9, y: -9 },
+            { x: 9, y: -9 },
+            { x: 9, y: 9 },
+            { x: -9, y: 9 }
           ];
-          ctx.fillStyle = '#38bdf8';
+          ctx.fillStyle = '#AEAC78';
           pods.forEach((p) => {
             ctx.beginPath();
             ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
@@ -526,22 +526,22 @@ export function MapCanvas({
           // Center Navigator Orb Core
           ctx.beginPath();
           ctx.arc(0, 0, 7, 0, Math.PI * 2);
-          ctx.fillStyle = '#0a0f1d';
-          ctx.shadowColor = '#00f2fe';
-          ctx.shadowBlur = 14;
+          ctx.fillStyle = '#FCF0DA';
+          ctx.shadowColor = '#F2C46A';
+          ctx.shadowBlur = 10;
           ctx.fill();
-          ctx.strokeStyle = '#00f2fe';
+          ctx.strokeStyle = '#4C4541';
           ctx.lineWidth = 2;
           ctx.stroke();
 
           // Center Compass Pointer Needle
           ctx.beginPath();
-          ctx.moveTo(6, 0);
+          ctx.moveTo(5, 0);
           ctx.lineTo(-3, -3);
           ctx.lineTo(-1, 0);
           ctx.lineTo(-3, 3);
           ctx.closePath();
-          ctx.fillStyle = '#00f2fe';
+          ctx.fillStyle = '#F2C46A';
           ctx.fill();
 
           ctx.restore();

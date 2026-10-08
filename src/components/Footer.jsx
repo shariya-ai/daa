@@ -1,5 +1,5 @@
 import React from 'react';
-import { Compass, ArrowUp, Github, Heart, Keyboard } from 'lucide-react';
+import { Compass, ArrowUp, Github, Keyboard } from 'lucide-react';
 import { sounds } from '../utils/soundEffects';
 
 export function Footer() {
@@ -24,7 +24,7 @@ export function Footer() {
         {/* Left Brand info */}
         <div className="footer-brand-col">
           <div className="footer-logo">
-            <Compass size={24} color="#00f2fe" />
+            <Compass size={24} color="#4C4541" />
             <span className="footer-brand-name">BudgetTrail</span>
           </div>
           <p className="footer-tagline">
@@ -45,7 +45,7 @@ export function Footer() {
         {/* Keyboard Shortcuts Reference */}
         <div className="footer-shortcuts-card">
           <div className="shortcuts-title">
-            <Keyboard size={15} color="#00f2fe" />
+            <Keyboard size={15} color="#4C4541" />
             <span>Keyboard Shortcuts</span>
           </div>
           <div className="shortcuts-grid">

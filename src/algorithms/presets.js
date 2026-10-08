@@ -1,5 +1,6 @@
 /**
  * BudgetTrail - Preset Orienteering Scenarios
+ * Light Theme Liquid Glass Palette: #4C4541, #F2C46A, #AEAC78, #FCF0DA
  */
 
 export const PRESET_SCENARIOS = [
@@ -7,7 +8,7 @@ export const PRESET_SCENARIOS = [
     id: 'scenic_trap',
     name: '1. The Scenic Tour Trap (Greedy Trap)',
     tag: 'Heuristic Trap',
-    color: '#f59e0b',
+    color: '#F2C46A',
     description: 'Greedy is lured into low-reward nearby cafes (R=2, Stay=12m), exhausting the budget. DP skips them and visits high-reward summits (R=10, 9) scoring +250% more reward!',
     depot: { x: 140, y: 260, name: 'Basecamp Hotel' },
     budget: 135,
@@ -27,7 +28,7 @@ export const PRESET_SCENARIOS = [
     id: 'time_crunch',
     name: '2. Strict Time Crunch (Tight Budget)',
     tag: 'Edge Case',
-    color: '#ef4444',
+    color: '#4C4541',
     description: 'Budget is razor-thin (65 min). The vehicle must precisely account for return travel time to depot. Only the highest density reward cluster is reachable.',
     depot: { x: 300, y: 240, name: 'Central Expedition HQ' },
     budget: 65,
@@ -45,7 +46,7 @@ export const PRESET_SCENARIOS = [
     id: 'metropolis_marathon',
     name: '3. Metropolis Sightseeing Marathon (n=12)',
     tag: 'Real-World Tour',
-    color: '#06b6d4',
+    color: '#AEAC78',
     description: 'A full 12-attraction city grid with diverse stay times and rewards across 4 geographic quadrants.',
     depot: { x: 350, y: 240, name: 'Grand Central Station' },
     budget: 240,
@@ -70,7 +71,7 @@ export const PRESET_SCENARIOS = [
     id: 'stepthrough_demo',
     name: '4. Step-Through Mini Demo (n=4)',
     tag: 'DP Stepper',
-    color: '#10b981',
+    color: '#AEAC78',
     description: 'Designed specifically for the Bitmask DP Table visualizer. Exactly 16 states (2^4) to easily trace recurrence relations and transitions.',
     depot: { x: 150, y: 220, name: 'Base Station' },
     budget: 150,
@@ -87,7 +88,7 @@ export const PRESET_SCENARIOS = [
     id: 'drone_relay',
     name: '5. Drone Survey Relay (n=14)',
     tag: 'Large Instance',
-    color: '#8b5cf6',
+    color: '#F2C46A',
     description: 'Battery-limited autonomous aerial survey with 14 high-value sensor nodes across a wide territory.',
     depot: { x: 350, y: 250, name: 'Drone Launch Pad' },
     budget: 260,

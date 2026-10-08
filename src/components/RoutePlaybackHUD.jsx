@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, Pause, RotateCcw, Clock, Target, Activity, Flame, ShieldAlert } from 'lucide-react';
+import { Play, Pause, RotateCcw, Clock, Target, Activity } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { sounds } from '../utils/soundEffects';
 
@@ -36,7 +36,7 @@ export function RoutePlaybackHUD({
         dist,
         travelTime,
         stayTime: place.stayTime,
-        duration: Math.max(0.4, travelTime + (place.stayTime * 0.05)), // Scaled for snappy animation
+        duration: Math.max(0.4, travelTime + (place.stayTime * 0.05)),
         stepNumber: i + 1,
         reward: place.reward,
         prevAccTime: accumulatedTime
@@ -76,13 +76,12 @@ export function RoutePlaybackHUD({
       liveTime: 0
     });
 
-    // Particle burst if DP or B&B optimal solution
     if (activeSol.isOptimal) {
       confetti({
         particleCount: 50,
         spread: 60,
         origin: { y: 0.8 },
-        colors: ['#00f2fe', '#10b981', '#f59e0b', '#8b5cf6']
+        colors: ['#4C4541', '#F2C46A', '#AEAC78', '#FCF0DA']
       });
     }
   };

@@ -1,6 +1,6 @@
 import React from 'react';
 import { REAL_WORLD_APPLICATIONS } from '../data/applicationsData';
-import { Layers, Compass, Plane, Zap, Briefcase, Waves, Sparkles, ArrowRight } from 'lucide-react';
+import { Layers, Compass, Plane, Zap, Briefcase, Waves, Sparkles } from 'lucide-react';
 
 export function ApplicationsSection() {
   const iconMap = {
@@ -11,7 +11,6 @@ export function ApplicationsSection() {
     Waves: Waves
   };
 
-  // Duplicate list to achieve continuous infinite marquee loop
   const carouselItems = [...REAL_WORLD_APPLICATIONS, ...REAL_WORLD_APPLICATIONS];
 
   return (
@@ -35,7 +34,6 @@ export function ApplicationsSection() {
         <div className="infinite-marquee-track">
           {carouselItems.map((app, idx) => {
             const Icon = iconMap[app.icon] || Compass;
-            // Slight alternating paper card rotation
             const rot = (idx % 2 === 0 ? -1.5 : 1.5) * ((idx % 3) + 0.5);
 
             return (
@@ -47,10 +45,10 @@ export function ApplicationsSection() {
                 }}
               >
                 <div className="paper-card-top">
-                  <div className="paper-icon-box" style={{ background: `${app.color}20`, color: app.color }}>
+                  <div className="paper-icon-box" style={{ background: 'rgba(242, 196, 106, 0.25)', color: '#4C4541' }}>
                     <Icon size={22} />
                   </div>
-                  <span className="paper-category-tag" style={{ color: app.color, borderColor: `${app.color}40` }}>
+                  <span className="paper-category-tag" style={{ color: '#4C4541', borderColor: 'rgba(76, 69, 65, 0.2)' }}>
                     {app.category}
                   </span>
                 </div>
@@ -66,7 +64,7 @@ export function ApplicationsSection() {
                 </div>
 
                 <div className="paper-impact-tag">
-                  <Sparkles size={13} color="#10b981" />
+                  <Sparkles size={13} color="#4C4541" />
                   <span>{app.impact}</span>
                 </div>
               </div>
