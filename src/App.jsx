@@ -194,6 +194,15 @@ export function App() {
   return (
     <div className="budgettrail-app-root">
       
+      {/* Liquid Glass Background Animated Blobs & Light Caustics */}
+      <div className="liquid-glass-background-container" aria-hidden="true">
+        <div className="liquid-blob blob-gold-1" />
+        <div className="liquid-blob blob-olive-1" />
+        <div className="liquid-blob blob-gold-2" />
+        <div className="liquid-blob blob-olive-2" />
+        <div className="liquid-glass-mesh-overlay" />
+      </div>
+
       {/* Custom Interactive Cursor */}
       <div className="custom-cursor-dot" ref={cursorRef} />
       <div className="custom-cursor-trail" ref={trailRef} />

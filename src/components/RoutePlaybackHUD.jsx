@@ -109,7 +109,7 @@ export function RoutePlaybackHUD({
     const curSegIdx = vehicleAnim.segmentIdx;
     currentStepText = curSegIdx >= vehicleAnim.segments.length 
       ? 'Tour Completed' 
-      : `Transit: Stop ${curSegIdx + 1} / ${vehicleAnim.segments.length}`;
+      : `Stop ${curSegIdx + 1}/${vehicleAnim.segments.length}`;
 
     for (let i = 0; i < Math.min(curSegIdx, vehicleAnim.segments.length); i++) {
       const s = vehicleAnim.segments[i];
@@ -140,38 +140,38 @@ export function RoutePlaybackHUD({
       <div className="playback-ribbon-top">
         <div className="playback-buttons-group">
           <button className="btn btn-primary" onClick={handleStartAnimation}>
-            <Play size={16} fill="currentColor" /> Play Route
+            <Play size={15} fill="currentColor" /> Play Route
           </button>
           <button
             className="btn btn-secondary btn-sm"
             onClick={handlePauseToggle}
             disabled={!vehicleAnim}
           >
-            <Pause size={14} /> {vehicleAnim?.paused ? 'Resume' : 'Pause'}
+            <Pause size={13} /> {vehicleAnim?.paused ? 'Resume' : 'Pause'}
           </button>
           <button
             className="btn btn-outline btn-sm"
             onClick={handleReset}
             disabled={!vehicleAnim}
           >
-            <RotateCcw size={14} /> Reset
+            <RotateCcw size={13} /> Reset
           </button>
         </div>
 
         <div className="playback-metrics-strip">
           <div className="telemetry-unit">
-            <span className="unit-lbl"><Target size={11} /> Total Reward Collected</span>
-            <span className="unit-val reward-cyan">+{liveReward} Points</span>
+            <span className="unit-lbl"><Target size={12} /> Reward</span>
+            <span className="unit-val reward-cyan">+{liveReward} Pts</span>
           </div>
 
           <div className="telemetry-unit">
-            <span className="unit-lbl"><Clock size={11} /> Time Used / Budget</span>
-            <span className="unit-val time-violet">{liveTimeSpent.toFixed(1)}m / {budget}m</span>
+            <span className="unit-lbl"><Clock size={12} /> Time / Budget</span>
+            <span className="unit-val">{liveTimeSpent.toFixed(1)}m / {budget}m</span>
           </div>
 
           <div className="telemetry-unit">
-            <span className="unit-lbl"><Activity size={11} /> Expedition Status</span>
-            <span className="unit-val">{currentStepText}</span>
+            <span className="unit-lbl"><Activity size={12} /> Status</span>
+            <span className="unit-val status-pill">{currentStepText}</span>
           </div>
         </div>
       </div>
@@ -179,8 +179,8 @@ export function RoutePlaybackHUD({
       {/* Real-time Budget Drain Bar */}
       <div className="budget-drain-container">
         <div className="budget-drain-header">
-          <span>Remaining Time Budget Gauge:</span>
-          <strong>{remainingBudget.toFixed(1)} min left ({budgetUsagePct.toFixed(0)}% used)</strong>
+          <span>Time Budget Usage:</span>
+          <strong>{remainingBudget.toFixed(1)} min remaining ({budgetUsagePct.toFixed(0)}% used)</strong>
         </div>
         <div className="budget-progress-track">
           <div
@@ -199,7 +199,7 @@ export function RoutePlaybackHUD({
         <div className="schedule-chips-scroll">
           <span className="schedule-chip depot">
             <strong>🏁 Depot v₀</strong>
-            <small>t = 0.0m</small>
+            <small>0.0m</small>
           </span>
 
           {activeSol?.arrivalTimes?.map((item, idx) => {
@@ -211,7 +211,7 @@ export function RoutePlaybackHUD({
                   <div className="chip-name">#{idx + 1} {p.name}</div>
                   <div className="chip-stats">
                     <span className="chip-reward">+{p.reward} R</span>
-                    <span className="chip-time">Arr: {item.arrivalTime.toFixed(1)}m (Stay: {p.stayTime}m)</span>
+                    <span className="chip-time">{item.arrivalTime.toFixed(1)}m</span>
                   </div>
                 </span>
               </React.Fragment>
@@ -222,8 +222,8 @@ export function RoutePlaybackHUD({
             <>
               <span className="schedule-arrow">➔</span>
               <span className="schedule-chip depot-return">
-                <strong>🏁 Return Depot v₀</strong>
-                <small>Close: {activeSol.timeUsed.toFixed(1)}m</small>
+                <strong>🏁 Return v₀</strong>
+                <small>{activeSol.timeUsed.toFixed(1)}m</small>
               </span>
             </>
           )}
